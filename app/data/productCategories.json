@@ -1,0 +1,39 @@
+[
+    {
+        "id": "a108632c-4736-4878-9669-92891a5a1aa5",
+        "name": "Optical Lens",
+        "productIds": [
+        "472fa924-97fd-42a0-9fda-bdfd2646a1df",
+        "be4c85ff-2792-46d2-8a76-f9edd38ffbbc",
+        "aba2ddc3-a605-48ef-8d41-1b420dd7b8b0",
+        "e4503337-7903-4126-886f-48c07f92361f",
+        "4cd3280e-28b5-4ac8-bfe0-5fafe63b7c1a",
+        "c2915e88-0de5-4fb6-8434-e421a91a1474"
+        ]
+    },
+    {
+        "id": "eeea18c1-ac44-47e4-8566-938152ea01fe",
+        "name": "Test",
+        "productIds": [
+        "1da971dd-4899-4241-8906-98a0400d1556",
+        "02281cc9-9cc5-426b-93ac-a733d6694580",
+        "0a4288d6-927d-4ba2-9dae-642ca70b3bba",
+        "946f96ca-0e55-4b49-bf60-3c97e681d879"
+        ]
+    },
+    {
+        "id": "017e031b-9284-4f59-a105-2340e95850b0",
+        "name": "Test2",
+        "productIds": [
+        "be4c85ff-2792-46d2-8a76-f9edd38ffbbc",
+        "aba2ddc3-a605-48ef-8d41-1b420dd7b8b0",
+        "e4503337-7903-4126-886f-48c07f92361f",
+        "4cd3280e-28b5-4ac8-bfe0-5fafe63b7c1a",
+        "08e3f796-5beb-4611-bf87-90dc377ded15",
+        "4f143065-0d70-4d4c-b330-a00acd3131cd",
+        "a0edee73-d26b-4e3d-a83c-7cba21c1a442",
+        "472fa924-97fd-42a0-9fda-bdfd2646a1df",
+        "c2915e88-0de5-4fb6-8434-e421a91a1474"
+        ]
+    }
+]

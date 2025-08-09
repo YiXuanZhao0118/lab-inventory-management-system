@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "username": "XYZ",
+    "passwordHash": "$2b$10$AtyEqe8U5.ZMAKfbGyxPWOe.B5mKoCdUwya6bNXu5vEoJsMGX/evG"
+  },
+  {
+    "id": 2,
+    "username": "1",
+    "passwordHash": "$2b$10$gNoCGB43pFfXEV/z1KwfA.59G1iXjOeedE.ZpboC/9yT5o1VbN9Zi"
+  },
+  {
+    "id": 3,
+    "username": "LJ",
+    "passwordHash": "$2b$10$2ddwUVB8mNk.kz/lnOmDje/7E2dX6rRwmuO7KdLmGxLruCf3K8mQm"
+  }
+]
