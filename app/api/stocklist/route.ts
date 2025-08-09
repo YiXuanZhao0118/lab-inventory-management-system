@@ -1,4 +1,4 @@
-// app/api/db/route.ts
+// app/api/stocklist/route.ts
 import { NextResponse } from 'next/server'
 import {
   getStock, getProducts, getLocationTree, getRentalLogs,

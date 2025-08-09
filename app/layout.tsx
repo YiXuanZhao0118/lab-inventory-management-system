@@ -5,8 +5,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import "@/styles/globals.css";
 import NavLink from "@/components/NavLink";
-import LoginPage from "@/pages/LoginPage";
-import Head from "./head";
+import LoginPage from "@/features/LoginPage";
+import Head from "@/app/head";
 import Link from "next/link";
 
 import { LanguageProvider, useLanguage } from "@/components/LanguageSwitcher";
@@ -60,8 +60,9 @@ function AppContent({ children }: { children: React.ReactNode }) {
   // 判斷路由是否需要驗證
   const publicPaths = [
     "/",
-    "/short_term",
+    "/short_term_rented",
     "/add_inventory",
+    "/products_overview",
     "/long_term_rented",
     "/generate_QRcode",
     "/device-registration",
@@ -148,10 +149,11 @@ function AppContent({ children }: { children: React.ReactNode }) {
             </span>
           </div>
           <nav className="flex-1 flex justify-end gap-1 text-sm font-medium">
-            <NavLink href="/short_term">{t.short_term_loan}</NavLink>
+            <NavLink href="/short_term_rented">{t.short_term_loan}</NavLink>
             <NavLink href="/stocks">{t.stocks}</NavLink>
             <NavLink href="/add_inventory">{t.add_inventory}</NavLink>
             <NavLink href="/long_term_rented">{t.loan_and_return}</NavLink>
+            <NavLink href="/products_overview">{t.products_overview}</NavLink>
             <NavLink href="/generate_QRcode">QRcode</NavLink>
             <NavLink href="/admin">{t.admin}</NavLink>
           </nav>

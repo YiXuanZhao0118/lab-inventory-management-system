@@ -1,6 +1,6 @@
 // app/add_inventory/page.tsx
 import React, { Suspense } from 'react';
-import AddStockPage from '@/pages/AddStockPage';
+import AddStockPage from '@/features/AddStockPage';
 
 export default function AddInventoryPage() {
   return (

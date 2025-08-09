@@ -6,9 +6,9 @@ const { parse } = require('url');
 const path = require('path');
 
 const dev = process.env.NODE_ENV !== 'production';
-const PORT = dev ? 3051 : 3050;
+const PORT = dev ? 3001 : 3000;
 
-// 👇 綁 0.0.0.0 讓手機也能連，實際 IP 用瀏覽器打 https://172.30.10.16:3051
+// 👇 綁 0.0.0.0 讓手機也能連，實際 IP 用瀏覽器打 https://172.30.10.16:3000
 const HOST = '0.0.0.0';
 
 const app = next({ dev });

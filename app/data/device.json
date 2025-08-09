@@ -113,5 +113,10 @@
     "deviceId": "076d4b5e-038d-42a3-a872-b8b804ba35f9",
     "name": "TEST",
     "currentDate": "2025-08-08T14:42:45.777Z"
+  },
+  {
+    "deviceId": "5b8e0e63-d03d-40fb-9c2f-27b54ea3f889",
+    "name": "test",
+    "currentDate": "2025-08-09T13:38:23.627Z"
   }
 ]

@@ -2,7 +2,7 @@
 "use client";
 
 import { Suspense } from "react";
-import StockList from "@/pages/StockList";
+import StockList from "@/features/StockList";
 
 export default function StocksPage() {
   return (

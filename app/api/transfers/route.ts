@@ -6,12 +6,16 @@ import {
   getProductById,
   getTransferLogs,
   saveTransferLogs,
+  // 👇 新增匯入
+  getLocationTree,
   StockItem,
-  TransferLog
+  TransferLog,
+  // 若有導出型別可一起匯入（可選）
+  // LocationNode
 } from '@/lib/db'
 import { v4 as uuid } from 'uuid'
 
-// Helper to validate a single stock item
+// Helper to validate a single stock item (保持你原本的)
 function validateStockItem(
   stockId: string,
   fromLocation: string,
@@ -28,6 +32,92 @@ function validateStockItem(
   return stock
 }
 
+/** ---------- 這是給 pages/Transfers.tsx 用的 GET ---------- */
+export async function GET() {
+  try {
+    const stock = getStock() as StockItem[]
+    const locations = getLocationTree?.() ?? [] // 若你的 db 是 getLocations() 就改成對的函式
+
+    // 建立 locationId -> path(labels[]) map
+    const id2Path = new Map<string, string[]>()
+    const dfs = (node: any, trail: string[]) => {
+      const next = [...trail, node.label]
+      id2Path.set(node.id, next)
+      node.children?.forEach((c: any) => dfs(c, next))
+    }
+    locations.forEach((root: any) => dfs(root, []))
+
+    // 僅挑可轉移的庫存
+    const eligible = stock.filter(
+      s => !s.discarded && s.currentStatus === 'in_stock'
+    )
+
+    // 分成：財產管理(逐一) / 非財產管理(聚合)
+    type PMItem = {
+      stockId: string
+      product: { id: string; name: string; model: string; brand: string }
+      locationId: string
+      locationPath: string[]
+    }
+    type NonPMGroup = {
+      productId: string
+      product: { id: string; name: string; model: string; brand: string }
+      locationId: string
+      locationPath: string[]
+      quantity: number
+    }
+
+    const pm: PMItem[] = []
+    const nonMap = new Map<string, NonPMGroup>() // key = productId::locationId
+
+    for (const s of eligible) {
+      const p = getProductById(s.productId)
+      if (!p) continue
+
+      const locationPath = id2Path.get(s.locationId) ?? []
+
+      if (p.isPropertyManaged) {
+        pm.push({
+          stockId: s.id,
+          product: { id: p.id, name: p.name, model: p.model, brand: p.brand },
+          locationId: s.locationId,
+          locationPath,
+        })
+      } else {
+        const key = `${p.id}::${s.locationId}`
+        const g = nonMap.get(key)
+        if (g) {
+          g.quantity += 1
+        } else {
+          nonMap.set(key, {
+            productId: p.id,
+            product: { id: p.id, name: p.name, model: p.model, brand: p.brand },
+            locationId: s.locationId,
+            locationPath,
+            quantity: 1,
+          })
+        }
+      }
+    }
+
+    // 穩定排序（可選）
+    pm.sort((a, b) => a.product.name.localeCompare(b.product.name))
+    const nonPropertyManaged = Array.from(nonMap.values()).sort(
+      (a, b) => a.product.name.localeCompare(b.product.name)
+    )
+
+    return NextResponse.json({
+      propertyManaged: pm,
+      nonPropertyManaged,
+      locations, // 前端若需要整棵樹就用這個
+    })
+  } catch (err: any) {
+    console.error('Transfers GET error:', err?.message || err)
+    return NextResponse.json({ error: 'Failed to load transfers data' }, { status: 500 })
+  }
+}
+
+/** ---------- 你原本的 POST（原封不動） ---------- */
 export async function POST(request: Request) {
   let transfers: any[]
   try {

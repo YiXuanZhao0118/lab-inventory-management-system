@@ -1,7 +1,7 @@
 "use client";
 
-import LoanForm from "@/pages/LongTermRentedPage";
-import ReturnPage from "@/pages/LongTermReturnPage";
+import LoanForm from "@/features/LongTermRentedPage";
+import ReturnPage from "@/features/LongTermReturnPage";
 import { useLanguage } from "@/components/LanguageSwitcher";
 import zhTW from "@/app/data/language/zh-TW.json";
 import enUS from "@/app/data/language/en-US.json";

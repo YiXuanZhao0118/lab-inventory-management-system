@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const stockItems = getStock()
   const products = getProducts()
 
-  // 依你的需求：discarded == false && currentStatus == 'long_term_rented'
+  // 依你的需求：discarded == false && currentStatus == 'long_term'
   const filtered = stockItems.filter(
     s => !s.discarded && s.currentStatus === 'in_stock'
   )

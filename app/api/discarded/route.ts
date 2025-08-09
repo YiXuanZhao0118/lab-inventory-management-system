@@ -1,76 +1,169 @@
 // app/api/discarded/route.ts
 import { NextResponse } from 'next/server'
-import { getStock, saveStock, getProductById, StockItem } from '@/lib/db'
+import {
+  getStock,
+  saveStock,
+  getProductById,
+  // ⬇️ 新增：給前端顯示用，跟 /api/stocklist 相同介面
+  getProducts,
+  getLocationTree,
+  StockItem
+} from '@/lib/db'
+
+type LegacySingle = { stockId: string; reason: string; operator: string }
+type LegacyBulk = {
+  productId: string
+  locationId: string
+  currentStatus: 'in_stock' | 'short_term' | 'long_term'
+  quantity: number
+  reason: string
+  operator: string
+}
+type NewSingle = { stockId: string }
+type NewBulk = {
+  productId: string
+  locationId: string
+  currentStatus: 'in_stock' | 'short_term' | 'long_term'
+  quantity: number
+}
+type NewPayload = { reason: string; operator: string; items: Array<NewSingle | NewBulk> }
+
+const VALID_STATUSES = new Set(['in_stock', 'short_term', 'long_term'])
+
+// ✅ 新增：GET（提供 Discarded 頁面用）
+// - 預設回傳 in_stock/short_term/long_term 且未報廢的庫存
+// - 可用 ?statuses=in_stock,long_term 來指定（可選）
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const statusesParam = url.searchParams.get('statuses') // e.g. 'in_stock,long_term'
+  const allowed = statusesParam
+    ? statusesParam
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => VALID_STATUSES.has(s))
+    : Array.from(VALID_STATUSES)
+
+  const stock = getStock() as StockItem[]
+  const products = getProducts?.() ?? []
+  const locations = getLocationTree?.() ?? []
+
+  const filteredStock = stock.filter(
+    s => !s.discarded && allowed.includes(s.currentStatus as any)
+  )
+
+  return NextResponse.json({ stock: filteredStock, products, locations }, { status: 200 })
+}
 
 export async function POST(request: Request) {
-  let payload: any[]
+  let body: unknown
   try {
-    payload = await request.json()
-    if (!Array.isArray(payload)) throw { status: 400, message: 'Body must be an array' }
-  } catch (e: any) {
-    const status = e.status || 400
-    return NextResponse.json({ error: e.message || 'Invalid JSON' }, { status })
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
   const stockItems: StockItem[] = getStock()
   const now = new Date().toISOString()
 
+  const processSingle = (item: { stockId: string }, reason: string, operator: string) => {
+    const { stockId } = item
+    if (!stockId || !reason || !operator) {
+      throw { status: 400, message: 'Missing fields for single discard' }
+    }
+    const stock = stockItems.find((s) => s.id === stockId)
+    if (!stock) throw { status: 404, message: `Stock ${stockId} not found` }
+    if (stock.discarded) throw { status: 400, message: `Stock ${stockId} already discarded` }
+
+    stock.discarded = true
+    stock.currentStatus = 'discarded'
+    stock.discardLog = { date: now, reason, operator }
+  }
+
+  const processBulk = (
+    item: {
+      productId: string
+      locationId: string
+      currentStatus: 'in_stock' | 'short_term' | 'long_term'
+      quantity: number
+    },
+    reason: string,
+    operator: string
+  ) => {
+    const { productId, locationId, currentStatus, quantity } = item
+    if (
+      !productId ||
+      !locationId ||
+      !currentStatus ||
+      !VALID_STATUSES.has(currentStatus) ||
+      typeof quantity !== 'number' ||
+      quantity < 1 ||
+      !reason ||
+      !operator
+    ) {
+      throw { status: 400, message: 'Missing or invalid fields for bulk discard (requires currentStatus)' }
+    }
+
+    const product = getProductById(productId)
+    if (!product || product.isPropertyManaged) {
+      throw { status: 400, message: 'Use single discard for managed products' }
+    }
+
+    const candidates = stockItems.filter(
+      (s) => s.productId === productId && s.locationId === locationId && s.currentStatus === currentStatus && !s.discarded
+    )
+    if (candidates.length < quantity) {
+      throw { status: 400, message: `Not enough to discard: available ${candidates.length}` }
+    }
+
+    for (let i = 0; i < quantity; i++) {
+      const s = candidates[i]
+      s.discarded = true
+      s.currentStatus = 'discarded'
+      s.discardLog = { date: now, reason, operator }
+    }
+  }
+
   try {
-    for (const item of payload) {
-      if ('stockId' in item) {
-        // property-managed single discard
-        const { stockId, reason, operator } = item as {
-          stockId: string
-          reason: string
-          operator: string
-        }
-        if (!stockId || !reason || !operator) throw { status: 400, message: 'Missing fields for single discard' }
-        const stock = stockItems.find((s) => s.id === stockId)
-        if (!stock) throw { status: 404, message: `Stock ${stockId} not found` }
-        if (stock.discarded) throw { status: 400, message: `Stock ${stockId} already discarded` }
-        stock.discarded = true
-        stock.currentStatus = 'discarded' // update status
-        stock.discardLog = { date: now, reason, operator }
-      } else {
-        // non-managed bulk discard
-        const { productId, locationId, currentStatus, quantity, reason, operator } = item as {
-          productId: string
-          locationId: string
-          currentStatus: 'in_stock' | 'short_term_rented' | 'long_term_rented'
-          quantity: number
-          reason: string
-          operator: string
-        }
-        // validate fields including currentStatus
-        if (
-          !productId || !locationId ||
-          !currentStatus || !['in_stock', 'short_term_rented', 'long_term_rented'].includes(currentStatus) ||
-          typeof quantity !== 'number' || quantity < 1 ||
-          !reason || !operator
-        ) throw { status: 400, message: 'Missing or invalid fields for bulk discard (requires currentStatus)' }
-        const product = getProductById(productId)
-        if (!product || product.isPropertyManaged) throw { status: 400, message: 'Use single discard for managed products' }
-        // find matching items
-        const candidates = stockItems.filter(
-          (s) =>
-            s.productId === productId &&
-            s.locationId === locationId &&
-            s.currentStatus === currentStatus &&
-            !s.discarded
-        )
-        if (candidates.length < quantity) throw { status: 400, message: `Not enough to discard: available ${candidates.length}` }
-        for (let i = 0; i < quantity; i++) {
-          const s = candidates[i]
-          s.discarded = true
-          s.currentStatus = 'discarded' // update status
-          s.discardLog = { date: now, reason, operator }
+    if (Array.isArray(body)) {
+      // Legacy mode: array of items, each item must include its own reason/operator
+      for (const item of body as Array<LegacySingle | LegacyBulk>) {
+        if (item && typeof item === 'object' && 'stockId' in item) {
+          const { stockId, reason, operator } = item as LegacySingle
+          processSingle({ stockId }, reason, operator)
+        } else if (item && typeof item === 'object') {
+          const { productId, locationId, currentStatus, quantity, reason, operator } = item as LegacyBulk
+          processBulk({ productId, locationId, currentStatus, quantity }, reason, operator)
+        } else {
+          throw { status: 400, message: 'Invalid item in array payload' }
         }
       }
+    } else if (body && typeof body === 'object') {
+      // New mode: { reason, operator, items: [...] }
+      const { reason, operator, items } = body as NewPayload
+      if (!reason || !operator || !Array.isArray(items) || items.length === 0) {
+        throw { status: 400, message: 'Body must include { reason, operator, items: [...] }' }
+      }
+
+      for (const entry of items) {
+        if (entry && typeof entry === 'object' && 'stockId' in entry) {
+          processSingle({ stockId: (entry as NewSingle).stockId }, reason, operator)
+        } else if (entry && typeof entry === 'object') {
+          const { productId, locationId, currentStatus, quantity } = entry as NewBulk
+          processBulk({ productId, locationId, currentStatus, quantity }, reason, operator)
+        } else {
+          throw { status: 400, message: 'Invalid item inside items[]' }
+        }
+      }
+    } else {
+      throw { status: 400, message: 'Body must be an array (legacy) or an object with items (new)' }
     }
+
     saveStock(stockItems)
     return NextResponse.json({ status: 'ok' }, { status: 200 })
   } catch (e: any) {
-    const status = e.status || 500
-    return NextResponse.json({ error: e.message || 'Internal server error' }, { status })
+    const status = e?.status || 500
+    return NextResponse.json({ error: e?.message || 'Internal server error' }, { status })
   }
 }
+
+
