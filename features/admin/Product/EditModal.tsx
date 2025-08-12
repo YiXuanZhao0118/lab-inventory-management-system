@@ -150,7 +150,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 
           {/* localImage (唯讀) */}
           <div>
-            <label className="block text-sm mb-1">{t.localImage ?? "本地圖片"}</label>
+            <label className="block text-sm mb-1">{t.imageLink ?? "本地圖片"}</label>
             <input
               className="w-full border rounded p-2 bg-gray-100 dark:bg-gray-800"
               value={draft.localImage ?? ""}

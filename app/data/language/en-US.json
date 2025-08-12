@@ -43,7 +43,7 @@
       "menu_edit_property": "Edit Property",
       "menu_dashboard": "Dashboard",
       "menu_stock_list": "Stock List",
-      "menu_all_loan_records": "All Loan Records"
+      "menu_all_loan_records": "Short-Term Loan Records"
     },
     "LocationTree": {
       "Alert1Part1": "Name",
@@ -62,23 +62,43 @@
       "model": "Model",
       "brand": "Brand",
       "specifications": "Specifications",
+      "price": "Price",
       "imageLink": "Image Link (optional)",
       "add_product": "Add Product",
       "add_location": "Add Location",
       "addProduct_success":"Product added successfully!",
       "addProduct_fail":"Failed to add product. Please try again.",
       "loading": "Loading...",
-      "addProduct_duplicate_error": "❗ A product with the same model and brand already exists and cannot be added."
+      "addProduct_duplicate_error": "❗ A product with the same model and brand already exists and cannot be added.",
+      "addProduct_success_with_image":"Product added successfully (image downloaded).",
+      "addProduct_success_no_image": "Product added successfully (image download failed, set to null).",
+      "isPropertyManaged": "Property Managed",
+      "autoDownloadNote": [
+        "※ After submission, the backend will attempt to download the image to ",
+        { "type": "code", "var": "path" },
+        ". If it fails, ",
+        { "type": "code", "var": "field" },
+        " will be set to ",
+        { "type": "code", "text": "null" },
+        "."
+      ],
+      "overwrite": "Overwrite Non-Empty Fields",
+      "fill_from_analyzer": "Fill Form from Analyzer",
+      "urlPlaceholder": "Enter product URL to analyze (e.g., https://www.thorlabs.com/thorproduct.cfm?partnumber=KA05)"
     },
     "EditModal": {
+      "price_invalid": "Price must be greater than 0",
+      "price_non_negative": "Price cannot be negative",
       "title": "Edit Product",
       "name": "Product Name",
       "model": "Model",
+      "price": "Price",
       "brand": "Brand",
       "specifications": "Specifications",
       "imageLink": "Image Link (optional)",
       "cancel": "Cancel",
-      "save": "Save"
+      "save": "Save",
+      "localImage_hint": "After saving, the system will attempt to download the image link; if it fails, it will remain null."
     },
     "EditProducts": {
       "title": "Edit Products",
@@ -86,10 +106,22 @@
       "model": "Model",
       "brand": "Brand",
       "specifications": "Specifications",
+      "price": "Price",
       "actions": "Actions",
       "edit": "Edit",
       "download_qrcode": "Download QR Code",
-      "search": "Search products..."
+      "search": "Search products...",
+      "editProduct_duplicate_error":"❗ A product with the same model and brand already exists and cannot be updated to the same values.",
+      "editProduct_success":"Product updated successfully!",
+      "editProduct_fail":"Failed to update product. Please try again.",
+      "delete_in_use": "❗ Cannot delete product as it is already in use by stock items.",
+      "delete_confirm": "Are you sure you want to delete this product?",
+      "delete_success": "Product deleted successfully!",
+      "delete_failed": "Failed to delete product. Please try again.",
+      "load_fail": "Failed to load products",
+      "loading": "Loading...",
+      "delete_disabled_hint": "❗ Cannot delete product as it is already in use by stock items.",
+      "delete": "Delete"
     },
     "Account": {
       "ChangePassword": {
@@ -103,7 +135,13 @@
         "change": "Change Password",
         "verify_failed": "Verification failed",
         "change_success": "Password changed successfully",
-        "change_failed": "Password change failed"
+        "change_failed": "Password change failed",
+        "too_short": "New password is too short, at least",
+        "not_match": "New password and confirmation do not match",
+        "loading": "Loading...",
+        "hint_min_length": "Password length must be at least",
+        "hint_min": "Password length must be at least",
+        "back": "Back to Account"
       },
       "CreateAccount": {
         "title": "Create Account",
@@ -113,7 +151,10 @@
         "create": "Create Account",
         "success": "✅ Account created successfully",
         "fail": "❌ Account creation failed",
-        "not_match": "❗ Password and confirmation do not match"
+        "not_match": "❗ Password and confirmation do not match",
+        "too_short": "❗ Password is too short",
+        "hint_min": "Password length must be at least",
+        "loading": "Processing..."
       }
     },
     "History": {
@@ -387,7 +428,10 @@
     "loadFailed": "Failed to load",
     "returnFailed": "Return failed: {errorMessage}",
     "noRecords": "No outstanding loan records.",
-    "unknownProduct": "Unknown Product"
+    "unknownProduct": "Unknown Product",
+    "searchPlaceholder": "Search Stock ID / Product ID / Product Name / Model / Brand / Borrower...",
+    "showOverdueOnly": "Show Overdue Only",
+    "refresh": "Refresh"
   },
   "FileUploadModal": {
     "title": "Upload Product Files ({{productId}})",

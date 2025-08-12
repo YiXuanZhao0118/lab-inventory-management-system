@@ -16,15 +16,22 @@ import enUS from "@/app/data/language/en-US.json";
 import hiIN from "@/app/data/language/hi.json";
 import deDE from "@/app/data/language/de.json";
 
+const LOCKED_ID = "1";                // 固定節點 id
+const LOCKED_NAME = "Container Area"; // 僅用於訊息顯示
+
 const clone = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
 const genId = () => Date.now().toString(36) + Math.random().toString(16).slice(2);
 
-// 清理空 children（保留 id/label）
+// 清理空 children；對 LOCKED_ID 永遠移除 children
 function cleanTree(nodes: LocationNode[]): LocationNode[] {
-  return nodes.map(({ id, label, children }) => ({
-    id, label,
-    ...(children && children.length > 0 ? { children: cleanTree(children) } : {}),
-  }));
+  return nodes.map(({ id, label, children }) => {
+    if (id === LOCKED_ID) return { id, label };
+    return {
+      id,
+      label,
+      ...(children && children.length > 0 ? { children: cleanTree(children) } : {}),
+    };
+  });
 }
 function collectLabels(nodes: LocationNode[], acc = new Set<string>()) {
   for (const n of nodes) {
@@ -72,7 +79,7 @@ export default function LocationTreeEditor() {
 
   useEffect(() => {
     if (!treeData) return;
-    // 確保每個節點都有 id
+    // 確保每個節點都有 id；LOCKED_ID 保留原樣
     const attachId = (arr: any[]): LocationNode[] =>
       arr.map((n) => ({
         id: n.id || genId(),
@@ -99,21 +106,35 @@ export default function LocationTreeEditor() {
     return copy;
   }
 
-  // ↑↓ 移動：不影響階層，永遠允許
+  // ↑↓ 移動：LOCKED_ID 禁止
   const move = (path: number[], d: 1 | -1) =>
     setLocalTree((prev) => {
+      const node = getNodeAtPath(prev, path);
+      if (node.id === LOCKED_ID) {
+        showMessage(`${LOCKED_NAME} 不能移動。`, "error");
+        return prev;
+      }
       const idx = Math.max(0, path[path.length - 1] + d);
-      const [without, node] = removeAtPath(prev, path);
-      return insertAtPath(without, [...path.slice(0, -1), idx], node);
+      const [without, moved] = removeAtPath(prev, path);
+      return insertAtPath(without, [...path.slice(0, -1), idx], moved);
     });
 
-  // → 縮排：會讓「前一個兄弟」變成父節點，需檢查那個「新父節點」不可有庫存
+  // → 縮排：LOCKED_ID 自身不可縮排；且不可將任何節點縮排到 LOCKED_ID 底下
   const indent = (path: number[]) => {
     const idx = path[path.length - 1];
     if (idx === 0) return; // 沒有前兄弟，不能縮排
+    const node = getNodeAtPath(localTree, path);
+    if (node.id === LOCKED_ID) {
+      showMessage(`${LOCKED_NAME} 只能在最上層，不能縮排。`, "error");
+      return;
+    }
     const parentPath = path.slice(0, -1);
     const wouldBeParent = getNodeAtPath(localTree, [...parentPath, idx - 1]);
 
+    if (wouldBeParent.id === LOCKED_ID) {
+      showMessage(`${LOCKED_NAME} 不可有下層。`, "error");
+      return;
+    }
     if (hasStock(wouldBeParent.id)) {
       showMessage(
         (t.cannotIndentParentHasStock ?? "此節點正要成為父節點，但它已有庫存。庫存只能掛在葉節點，請先移走庫存或改別處。"),
@@ -123,27 +144,32 @@ export default function LocationTreeEditor() {
     }
 
     setLocalTree((prev) => {
-      const [without, node] = removeAtPath(prev, path);
+      const [without, n] = removeAtPath(prev, path);
       const copy = clone(without);
       let arr: any = copy;
       for (let k of parentPath) arr = arr[k].children!;
       arr[idx - 1].children = arr[idx - 1].children || [];
-      return insertAtPath(copy, [...parentPath, idx - 1, arr[idx - 1].children.length], node);
+      return insertAtPath(copy, [...parentPath, idx - 1, arr[idx - 1].children.length], n);
     });
   };
 
-  // ← 反縮排：不會讓某個「有庫存節點」新增子節點，因此允許
+  // ← 反縮排：LOCKED_ID 禁止
   const outdent = (path: number[]) => {
     if (path.length < 2) return;
+    const node = getNodeAtPath(localTree, path);
+    if (node.id === LOCKED_ID) {
+      showMessage(`${LOCKED_NAME} 只能在最上層。`, "error");
+      return;
+    }
     setLocalTree((prev) => {
-      const [without, node] = removeAtPath(prev, path);
+      const [without, n] = removeAtPath(prev, path);
       const parentIdx = path[path.length - 2];
       const grandPath = path.slice(0, -2);
-      return insertAtPath(without, [...grandPath, parentIdx + 1], node);
+      return insertAtPath(without, [...grandPath, parentIdx + 1], n);
     });
   };
 
-  // 重新命名（允許；ID 不變，後端一次儲存驗證）
+  // 重新命名（允許；ID 不變）
   const rename = (path: number[], newLabel: string) => {
     const copy: any = clone(localTree);
     const allLabels = collectLabels(copy);
@@ -159,8 +185,13 @@ export default function LocationTreeEditor() {
     setLocalTree(copy);
   };
 
-  // 新增兄弟（不會讓誰變父節點，所以允許）
+  // 新增兄弟：LOCKED_ID 禁止
   const addSibling = (path: number[]) => {
+    const node = getNodeAtPath(localTree, path);
+    if (node.id === LOCKED_ID) {
+      showMessage(`${LOCKED_NAME} 僅可改名稱，不可新增同層節點（請在其他節點上操作）。`, "error");
+      return;
+    }
     const lab = prompt(t.newLabel ?? "新名稱");
     if (!lab) return;
     setLocalTree((prev) => {
@@ -178,9 +209,13 @@ export default function LocationTreeEditor() {
     });
   };
 
-  // 刪除節點：若自己或子孫任一節點有庫存 → 禁止
+  // 刪除節點：LOCKED_ID 禁止；其餘若自己或子孫有庫存禁止
   const deleteNode = (path: number[]) => {
     const node = getNodeAtPath(localTree, path);
+    if (node.id === LOCKED_ID) {
+      showMessage(`${LOCKED_NAME} 不能刪除。`, "error");
+      return;
+    }
     const ids = collectSubtreeIds(node);
     const hit = ids.filter((id) => hasStock(id));
     if (hit.length > 0) {
@@ -194,7 +229,7 @@ export default function LocationTreeEditor() {
     setLocalTree((prev) => removeAtPath(prev, path)[0]);
   };
 
-  // 展開/收合
+  // 展開/收合（LOCKED_ID 無子層，不顯示切換）
   const toggle = (path: number[]) => {
     const key = path.join("-");
     setOpenSet((s) => {
@@ -208,8 +243,9 @@ export default function LocationTreeEditor() {
     nodes.map((n, i) => {
       const path = [...base, i];
       const key = path.join("-");
-      const hasChild = !!n.children?.length;
-      const isOpen = openSet.has(key);
+      const isLocked = n.id === LOCKED_ID;
+      const hasChild = !isLocked && !!n.children?.length;
+      const isOpen = hasChild && openSet.has(key);
       const count = usage[n.id] ?? 0;
 
       return (
@@ -226,7 +262,8 @@ export default function LocationTreeEditor() {
             <span
               contentEditable
               suppressContentEditableWarning
-              className="flex-1 px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-sky-400"
+              className={`flex-1 px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 ${isLocked ? "focus:ring-amber-400" : "focus:ring-sky-400"}`}
+              title={isLocked ? `${LOCKED_NAME} 只能更名` : ""}
               onBlur={(e) => rename(path, e.currentTarget.textContent || "")}
             >
               {n.label}
@@ -240,24 +277,28 @@ export default function LocationTreeEditor() {
             )}
 
             <div className="flex gap-1">
-              <button onClick={() => move(path, -1)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
-                <ArrowUp size={16} />
-              </button>
-              <button onClick={() => move(path, 1)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
-                <ArrowDown size={16} />
-              </button>
-              <button onClick={() => indent(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
-                <ArrowRight size={16} />
-              </button>
-              <button onClick={() => outdent(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
-                <ArrowLeft size={16} />
-              </button>
-              <button onClick={() => addSibling(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
-                <PlusCircle size={16} className="text-blue-600" />
-              </button>
-              <button onClick={() => deleteNode(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
-                <Trash2 size={16} className="text-red-600" />
-              </button>
+              {!isLocked && (
+                <>
+                  <button onClick={() => move(path, -1)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                    <ArrowUp size={16} />
+                  </button>
+                  <button onClick={() => move(path, 1)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                    <ArrowDown size={16} />
+                  </button>
+                  <button onClick={() => indent(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                    <ArrowRight size={16} />
+                  </button>
+                  <button onClick={() => outdent(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                    <ArrowLeft size={16} />
+                  </button>
+                  <button onClick={() => addSibling(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                    <PlusCircle size={16} className="text-blue-600" />
+                  </button>
+                  <button onClick={() => deleteNode(path)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                    <Trash2 size={16} className="text-red-600" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -285,6 +326,12 @@ export default function LocationTreeEditor() {
           showMessage(t.ServerLeafRule ?? "有庫存的節點必須是葉節點。", "error", 2200);
         } else if (code === "DELETE_BLOCKED_STOCK") {
           showMessage(t.ServerDeleteBlocked ?? "部分節點仍有庫存，無法刪除。", "error", 2200);
+        } else if (code === "CONTAINER_REQUIRED") {
+          showMessage(`${LOCKED_NAME} 不可移除。`, "error", 2200);
+        } else if (code === "CONTAINER_MUST_BE_ROOT") {
+          showMessage(`${LOCKED_NAME} 必須位於最上層。`, "error", 2200);
+        } else if (code === "CONTAINER_NO_CHILDREN") {
+          showMessage(`${LOCKED_NAME} 不可有下層。`, "error", 2200);
         } else {
           showMessage((t.Alert2Part2 ?? "儲存失敗") + (j?.error ? `：${j.error}` : ""), "error", 2200);
         }

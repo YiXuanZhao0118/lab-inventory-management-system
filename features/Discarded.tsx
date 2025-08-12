@@ -2,51 +2,42 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { fetcher } from "@/services/apiClient";
 
-type BulkStatus = "in_stock" | "short_term" | "long_term";
+type BulkStatus = "in_stock" | "long_term";
 
-type Product = {
-  id: string;
-  name: string;
-  brand: string;
-  model: string;
-  specifications?: string;
-  isPropertyManaged: boolean;
-};
-
-type StockRow = {
-  id: string; // stockId
-  productId: string;
-  locationId: string;
-  currentStatus: BulkStatus | "discarded";
-  discarded?: boolean;
-};
-
-type LocationNode = { id: string; label: string; children?: LocationNode[] };
-
-type StockListResp = {
-  stock: StockRow[];
-  products: Product[];
-  locations: LocationNode[];
-};
-
-// ---- cart types ----
-type CartPM = {
-  type: "pm";
+type PMItem = {
   stockId: string;
+  product: { id: string; name: string; model: string; brand: string };
+  locationId: string;
+  locationPath: string[];
+  currentStatus: BulkStatus;
 };
 
+type NonPMGroup = {
+  productId: string;
+  product: { id: string; name: string; model: string; brand: string };
+  locationId: string;
+  locationPath: string[];
+  quantity: number; // available at source
+  currentStatus: BulkStatus;
+};
+
+type GetResp = {
+  propertyManaged: PMItem[];
+  nonPropertyManaged: NonPMGroup[];
+};
+
+type CartPM = { type: "pm"; stockId: string };
 type CartNonPM = {
   type: "non";
   productId: string;
   locationId: string;
   currentStatus: BulkStatus;
   quantity: number;
-  max: number; // cap available
+  max: number;
 };
-
 type CartItem = CartPM | CartNonPM;
 
 export default function DiscardedModal({
@@ -56,161 +47,127 @@ export default function DiscardedModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { mutate } = useSWRConfig();
-  const { data, error } = useSWR<StockListResp>("/api/discarded", fetcher, {
-    revalidateOnFocus: false,
+  const { data, error } = useSWR<GetResp>("/api/discarded", fetcher, {
+    revalidateOnFocus: true,
   });
 
-  const products = data?.products ?? [];
-  const stock = data?.stock ?? [];
-  const locations = data?.locations ?? [];
-
   const [message, setMessage] = useState<string | null>(null);
+  const [searchPM, setSearchPM] = useState("");
+  const [searchNon, setSearchNon] = useState("");
 
-  // ----- status filter (multi-select) -----
-  const AVAILABLE: Array<"in_stock" | "long_term"> = [
+  // 狀態篩選（多選）
+  const AVAILABLE: BulkStatus[] = ["in_stock", "long_term"];
+  const [selectedStatuses, setSelectedStatuses] = useState<BulkStatus[]>([
     "in_stock",
     "long_term",
-  ];
-  const [selectedStatuses, setSelectedStatuses] = useState<
-    Array<"in_stock" | "long_term">
-  >(["in_stock", "long_term"]);
-  const toggleStatus = (st: "in_stock" | "long_term") =>
+  ]);
+  const toggleStatus = (st: BulkStatus) =>
     setSelectedStatuses((arr) =>
       arr.includes(st) ? arr.filter((x) => x !== st) : [...arr, st]
     );
 
-  // ----- maps -----
-  const productMap = useMemo(() => {
-    const m = new Map<string, Product>();
-    for (const p of products) m.set(p.id, p);
-    return m;
-  }, [products]);
+  // ====== 來源清單處理 ======
+  const allPM = data?.propertyManaged ?? [];
+  const allNon = data?.nonPropertyManaged ?? [];
 
-  const locLabelMap = useMemo(() => {
-    const m = new Map<string, string>();
-    const walk = (n: LocationNode, trail: string[]) => {
-      const next = [...trail, n.label];
-      m.set(n.id, next.join(" → "));
-      n.children?.forEach((c) => walk(c, next));
-    };
-    locations.forEach((r) => walk(r, []));
-    return m;
-  }, [locations]);
+  // 依狀態與搜尋過濾（PM）
+  const pmList = useMemo(() => {
+    const base = allPM.filter((i) => selectedStatuses.includes(i.currentStatus));
+    if (!searchPM.trim()) return base;
+    const q = searchPM.trim().toLowerCase();
+    return base.filter((i) =>
+      [
+        i.stockId,
+        i.product.name,
+        i.product.model,
+        i.product.brand,
+        i.locationPath.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [allPM, selectedStatuses, searchPM]);
 
-  // ----- filter visible by selected statuses -----
-  const visible = useMemo(
-    () =>
-      stock.filter(
-        (s) =>
-          !s.discarded &&
-          (selectedStatuses as BulkStatus[]).includes(
-            s.currentStatus as BulkStatus
-          )
-      ),
-    [stock, selectedStatuses]
-  );
+  // 依狀態與搜尋過濾（Non-PM）
+  const nonList = useMemo(() => {
+    const base = allNon.filter((g) => selectedStatuses.includes(g.currentStatus));
+    if (!searchNon.trim()) return base;
+    const q = searchNon.trim().toLowerCase();
+    return base.filter((g) =>
+      [
+        g.productId,
+        g.product.name,
+        g.product.model,
+        g.product.brand,
+        g.locationPath.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [allNon, selectedStatuses, searchNon]);
 
-  // left column: property-managed (individual)
-  const pmList = useMemo(
-    () =>
-      visible.filter((s) => productMap.get(s.productId)?.isPropertyManaged),
-    [visible, productMap]
-  );
-
-  // right column: non-property-managed grouped by (productId, locationId, currentStatus)
-  type NonGroup = {
-    productId: string;
-    locationId: string;
-    currentStatus: BulkStatus;
-    quantity: number; // available count
+  // 取得目前 cap（防止後端資料更新後超量）
+  const getCap = (productId: string, locationId: string, currentStatus: BulkStatus) => {
+    const row = allNon.find(
+      (g) =>
+        g.productId === productId &&
+        g.locationId === locationId &&
+        g.currentStatus === currentStatus
+    );
+    return row?.quantity ?? 0;
   };
-  const nonGroups = useMemo(() => {
-    const map = new Map<string, NonGroup>();
-    for (const s of visible) {
-      const p = productMap.get(s.productId);
-      if (!p || p.isPropertyManaged) continue;
-      const key = `${s.productId}::${s.locationId}::${s.currentStatus}`;
-      const g =
-        map.get(key) ||
-        ({
-          productId: s.productId,
-          locationId: s.locationId,
-          currentStatus: s.currentStatus as BulkStatus,
-          quantity: 0,
-        } as NonGroup);
-      g.quantity += 1;
-      map.set(key, g);
-    }
-    return Array.from(map.values());
-  }, [visible, productMap]);
 
-  // helper: compute available cap for a non-PM group (from raw stock)
-  const nonCap = (productId: string, locationId: string, st: BulkStatus) =>
-    stock.filter(
-      (s) =>
-        !s.discarded &&
-        s.productId === productId &&
-        s.locationId === locationId &&
-        s.currentStatus === st &&
-        !productMap.get(s.productId)?.isPropertyManaged
-    ).length;
-
-  // ----- selection cart -----
+  // ====== 選擇區 ======
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // keep cart caps in sync if data changes
+  // 後端資料變動時，校正非財 cart 的 max/quantity
   useEffect(() => {
-    setCart(prev => {
+    if (!data) return;
+    setCart((prev) => {
       let changed = false;
-      const next = prev.map(c => {
-        if (c.type !== "non") return c;
-
-        const newMax = nonCap(c.productId, c.locationId, c.currentStatus);
-        const newQty = Math.min((c as CartNonPM).quantity, newMax);
-
-        if (newMax !== (c as CartNonPM).max || newQty !== (c as CartNonPM).quantity) {
-          changed = true;
-          return { ...(c as CartNonPM), max: newMax, quantity: newQty };
+      const next = prev.map((c) => {
+        if (c.type === "non") {
+          const n = c as CartNonPM;
+          const newMax = getCap(n.productId, n.locationId, n.currentStatus);
+          const newQty = Math.min(n.quantity, newMax);
+          if (newMax !== n.max || newQty !== n.quantity) {
+            changed = true;
+            return { ...n, max: newMax, quantity: newQty };
+          }
         }
         return c;
       });
-
-      // 只有真的有變動才回傳新陣列，否則回傳 prev（避免無限 re-render）
       return changed ? next : prev;
     });
-  }, [stock, products]);
+  }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // add handlers
-  const addPM = (stockId: string) => {
+  const addPM = (stockId: string) =>
     setCart((prev) =>
       prev.some((x) => x.type === "pm" && x.stockId === stockId)
         ? prev
         : [...prev, { type: "pm", stockId }]
     );
-  };
 
-  const addNon = (
-    productId: string,
-    locationId: string,
-    currentStatus: BulkStatus
-  ) => {
+  const addNon = (productId: string, locationId: string, currentStatus: BulkStatus) =>
     setCart((prev) => {
       const idx = prev.findIndex(
         (x) =>
           x.type === "non" &&
-          x.productId === productId &&
-          x.locationId === locationId &&
-          x.currentStatus === currentStatus
+          (x as CartNonPM).productId === productId &&
+          (x as CartNonPM).locationId === locationId &&
+          (x as CartNonPM).currentStatus === currentStatus
       );
-      const cap = nonCap(productId, locationId, currentStatus);
+      const cap = getCap(productId, locationId, currentStatus);
+      if (cap <= 0) return prev;
       if (idx >= 0) {
         const cur = prev[idx] as CartNonPM;
         if (cur.quantity >= cur.max) return prev;
         const next = [...prev];
         next[idx] = { ...cur, quantity: Math.min(cur.quantity + 1, cap), max: cap };
         return next;
-        }
+      }
       return [
         ...prev,
         {
@@ -223,12 +180,10 @@ export default function DiscardedModal({
         } as CartNonPM,
       ];
     });
-  };
 
-  // native drag helpers
-  const onDragStart = (e: React.DragEvent, dragId: string) => {
+  // 簡易拖拉
+  const onDragStart = (e: React.DragEvent, dragId: string) =>
     e.dataTransfer.setData("text/plain", dragId);
-  };
   const onDropToSelection = (e: React.DragEvent) => {
     e.preventDefault();
     const dragId = e.dataTransfer.getData("text/plain");
@@ -242,11 +197,9 @@ export default function DiscardedModal({
   };
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
 
-  // reason & operator
+  // 原因/經辦 + 送出
   const [reason, setReason] = useState("");
   const [operator, setOperator] = useState("");
-
-  // confirm modal
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [posting, setPosting] = useState(false);
 
@@ -258,29 +211,24 @@ export default function DiscardedModal({
     setConfirmOpen(true);
   };
 
-  // payload
   const buildPayload = () => {
     const items: Array<
       | { stockId: string }
-      | {
-          productId: string;
-          locationId: string;
-          currentStatus: BulkStatus;
-          quantity: number;
-        }
+      | { productId: string; locationId: string; currentStatus: BulkStatus; quantity: number }
     > = [];
     for (const c of cart) {
       if (c.type === "pm") {
         items.push({ stockId: (c as CartPM).stockId });
       } else {
         const n = c as CartNonPM;
-        if (n.quantity > 0)
+        if (n.quantity > 0) {
           items.push({
             productId: n.productId,
             locationId: n.locationId,
             currentStatus: n.currentStatus,
             quantity: n.quantity,
           });
+        }
       }
     }
     return { reason: reason.trim(), operator: operator.trim(), items };
@@ -289,11 +237,10 @@ export default function DiscardedModal({
   const doSubmit = async () => {
     setPosting(true);
     try {
-      const payload = buildPayload();
       const res = await fetch("/api/discarded", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(buildPayload()),
       });
       const j = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(j?.error || `HTTP ${res.status}`);
@@ -303,75 +250,17 @@ export default function DiscardedModal({
       setReason("");
       setOperator("");
       setConfirmOpen(false);
-      await mutate("/api/discarded");
-    } catch (e: any) {
-      setMessage(`報廢失敗：${e?.message || e}`);
-    } finally {
-      setPosting(false);
-    }
+
+      } catch (e: any) {
+        setMessage(`報廢失敗：${e?.message || e}`);
+        setTimeout(() => {
+          setMessage(null);
+        }, 500);
+      } finally {
+        setPosting(false);
+      }
   };
 
-  // UI card renderers
-  const PMCard = ({ s }: { s: StockRow }) => {
-    const p = productMap.get(s.productId);
-    return (
-      <div
-        draggable
-        onDragStart={(e) => onDragStart(e, `pm::${s.id}`)}
-        className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-sm transition flex items-start gap-3"
-      >
-        <div className="flex-1">
-          <div className="text-sm font-medium">
-            {p?.name} / {p?.model} / {p?.brand}
-          </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            Stock: <code>{s.id}</code>
-          </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            {s.currentStatus} · {locLabelMap.get(s.locationId) || s.locationId}
-          </div>
-        </div>
-        <button
-          className="px-2 py-1 text-xs rounded bg-blue-600 text-white"
-          onClick={() => addPM(s.id)}
-        >
-          加入
-        </button>
-      </div>
-    );
-  };
-
-  const NonGroupCard = ({ g }: { g: NonGroup }) => {
-    const p = productMap.get(g.productId);
-    return (
-      <div
-        draggable
-        onDragStart={(e) =>
-          onDragStart(
-            e,
-            `non::${g.productId}::${g.locationId}::${g.currentStatus}`
-          )
-        }
-        className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-sm transition flex items-start gap-3"
-      >
-        <div className="flex-1">
-          <div className="text-sm font-medium">
-            {p?.name} / {p?.model} / {p?.brand}
-          </div>
-        </div>
-        <div className="text-xs text-gray-600 dark:text-gray-400">
-          {g.currentStatus} · {locLabelMap.get(g.locationId) || g.locationId}
-          <div className="mt-1">可用數量：{g.quantity}</div>
-        </div>
-        <button
-          className="ml-3 px-2 py-1 text-xs rounded bg-blue-600 text-white"
-          onClick={() => addNon(g.productId, g.locationId, g.currentStatus)}
-        >
-          加入
-        </button>
-      </div>
-    );
-  };
 
   if (!isOpen) return null;
 
@@ -393,13 +282,9 @@ export default function DiscardedModal({
         </div>
 
         {error && (
-          <div className="p-6 text-red-600">
-            載入失敗：{(error as Error).message}
-          </div>
+          <div className="p-6 text-red-600">載入失敗：{(error as Error).message}</div>
         )}
-        {!data && !error && (
-          <div className="p-6 text-gray-600">載入中…</div>
-        )}
+        {!data && !error && <div className="p-6 text-gray-600">載入中…</div>}
 
         {data && (
           <div className="p-6 space-y-6 flex-1 overflow-y-auto">
@@ -412,7 +297,7 @@ export default function DiscardedModal({
               </div>
             )}
 
-            {/* status multi-select */}
+            {/* 狀態篩選 */}
             <section className="p-4 rounded-xl border dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="text-sm text-gray-600 dark:text-gray-300">
@@ -437,44 +322,102 @@ export default function DiscardedModal({
               </div>
             </section>
 
-            {/* two columns */}
+            {/* 兩欄：PM / NonPM */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* PM left */}
+              {/* PM（逐一） */}
               <div className="p-4 rounded-xl border dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <h3 className="font-semibold mb-3">
-                  財產品（isPropertyManaged = true）
-                </h3>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold">財產管理（逐一）</h3>
+                  <input
+                    className="px-2 py-1 border rounded dark:bg-gray-800 dark:border-gray-700"
+                    placeholder="搜尋…"
+                    value={searchPM}
+                    onChange={(e) => setSearchPM(e.target.value)}
+                  />
+                </div>
                 <div className="grid gap-3 max-h-[420px] overflow-auto pr-1">
                   {pmList.length === 0 && (
                     <div className="text-sm text-gray-500">無可報廢項目</div>
                   )}
                   {pmList.map((s) => (
-                    <PMCard key={s.id} s={s} />
+                    <div
+                      key={s.stockId}
+                      draggable
+                      onDragStart={(e) => onDragStart(e, `pm::${s.stockId}`)}
+                      className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-sm transition flex items-start gap-3"
+                    >
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">
+                          {s.product.name} / {s.product.model} / {s.product.brand}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          Stock: <code>{s.stockId}</code>
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          {s.currentStatus} · {s.locationPath.join(" → ")}
+                        </div>
+                      </div>
+                      <button
+                        className="px-2 py-1 text-xs rounded bg-blue-600 text-white"
+                        onClick={() => addPM(s.stockId)}
+                      >
+                        加入
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Non-PM right (grouped with quantities) */}
+              {/* Non-PM（聚合） */}
               <div className="p-4 rounded-xl border dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <h3 className="font-semibold mb-3">
-                  非財產品（分組 + 可選數量）
-                </h3>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold">非財產（聚合）</h3>
+                  <input
+                    className="px-2 py-1 border rounded dark:bg-gray-800 dark:border-gray-700"
+                    placeholder="搜尋…"
+                    value={searchNon}
+                    onChange={(e) => setSearchNon(e.target.value)}
+                  />
+                </div>
                 <div className="grid gap-3 max-h-[420px] overflow-auto pr-1">
-                  {nonGroups.length === 0 && (
+                  {nonList.length === 0 && (
                     <div className="text-sm text-gray-500">無可報廢項目</div>
                   )}
-                  {nonGroups.map((g) => (
-                    <NonGroupCard
+                  {nonList.map((g) => (
+                    <div
                       key={`${g.productId}::${g.locationId}::${g.currentStatus}`}
-                      g={g}
-                    />
+                      draggable
+                      onDragStart={(e) =>
+                        onDragStart(
+                          e,
+                          `non::${g.productId}::${g.locationId}::${g.currentStatus}`
+                        )
+                      }
+                      className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-sm transition flex items-start gap-3"
+                    >
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">
+                          {g.product.name} / {g.product.model} / {g.product.brand}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          {g.currentStatus} · {g.locationPath.join(" → ")}
+                          <div className="mt-1">可用數量：{g.quantity}</div>
+                        </div>
+                      </div>
+                      <button
+                        className="ml-3 px-2 py-1 text-xs rounded bg-blue-600 text-white"
+                        onClick={() => addNon(g.productId, g.locationId, g.currentStatus)}
+                      >
+                        加入
+                      </button>
+                    </div>
                   ))}
                 </div>
               </div>
             </section>
 
-            {/* selection area */}
-            <section className="p-4 rounded-xl border dark:border-gray-700 bg-gray-50 dark:bg-gray-900 space-y-4">
+            {/* 選擇區 */}
+            <section className="p-3 rounded-xl dark:border-gray-700 bg-gray-50 dark:bg-gray-900 space-y-4">
               <h3 className="font-semibold text-lg">🧺 選擇區（拖拉或點「加入」）</h3>
               <div
                 className="min-h-[160px] p-4 rounded-lg border-2 border-dashed dark:border-gray-700 bg-white dark:bg-gray-800"
@@ -487,125 +430,124 @@ export default function DiscardedModal({
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {cart.map((c, idx) => {
-                      if (c.type === "pm") {
-                        const s = stock.find((x) => x.id === (c as CartPM).stockId);
-                        const p = s ? productMap.get(s.productId) : undefined;
-                        return (
-                          <div
-                            key={`pm-${idx}`}
-                            className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 flex items-start justify-between gap-3"
+                    {cart.map((c, idx) =>
+                      c.type === "pm" ? (
+                        <div
+                          key={`pm-${idx}`}
+                          className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 flex items-start justify-between gap-3"
+                        >
+                          <div className="text-sm font-medium">
+                            #{(c as CartPM).stockId}
+                          </div>
+                          <button
+                            className="px-2 py-1 text-xs rounded bg-red-600 text-white"
+                            onClick={() =>
+                              setCart((prev) => prev.filter((_, i) => i !== idx))
+                            }
                           >
-                            <div>
-                              <div className="text-sm font-medium">
-                                #{(c as CartPM).stockId} — {p?.name} / {p?.model} / {p?.brand}
-                              </div>
-                              {s && (
-                                <div className="text-xs text-gray-600 dark:text-gray-400">
-                                  {s.currentStatus} · {locLabelMap.get(s.locationId) || s.locationId}
+                            移除
+                          </button>
+                        </div>
+                      ) : (
+                        (() => {
+                          const n = c as CartNonPM;
+                          const src = allNon.find(
+                            (g) =>
+                              g.productId === n.productId &&
+                              g.locationId === n.locationId &&
+                              g.currentStatus === n.currentStatus
+                          );
+                          return (
+                            <div
+                              key={`non-${idx}`}
+                              className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between gap-3"
+                            >
+                              <div className="min-w-0">
+                                <div className="text-sm font-medium truncate">
+                                  {src?.product.name} / {src?.product.model} / {src?.product.brand}
                                 </div>
-                              )}
-                            </div>
-                            <button
-                              className="px-2 py-1 text-xs rounded bg-red-600 text-white"
-                              onClick={() =>
-                                setCart((prev) => prev.filter((_, i) => i !== idx))
-                              }
-                            >
-                              移除
-                            </button>
-                          </div>
-                        );
-                      } else {
-                        const n = c as CartNonPM;
-                        const p = productMap.get(n.productId);
-                        return (
-                          <div
-                            key={`non-${idx}`}
-                            className="p-3 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between gap-3"
-                          >
-                            <div className="min-w-0">
-                              <div className="text-sm font-medium truncate">
-                                {p?.name} / {p?.model} / {p?.brand}
+                                <div className="text-xs text-gray-600 dark:text-gray-400">
+                                  {n.currentStatus} · {src?.locationPath.join(" → ") || n.locationId}
+                                </div>
                               </div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400">
-                                {n.currentStatus} · {locLabelMap.get(n.locationId) || n.locationId}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">數量</span>
-                              <button
-                                className="px-2 py-1 rounded border dark:border-gray-700"
-                                onClick={() =>
-                                  setCart((prev) =>
-                                    prev.map((x, i) =>
-                                      i === idx
-                                        ? ({
-                                            ...(x as CartNonPM),
-                                            quantity: Math.max(
-                                              1,
-                                              (x as CartNonPM).quantity - 1
-                                            ),
-                                          } as CartItem)
-                                        : x
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm">數量</span>
+                                <button
+                                  className="px-2 py-1 rounded border dark:border-gray-700"
+                                  onClick={() =>
+                                    setCart((prev) =>
+                                      prev.map((x, i) =>
+                                        i === idx
+                                          ? ({
+                                              ...(x as CartNonPM),
+                                              quantity: Math.max(
+                                                1,
+                                                (x as CartNonPM).quantity - 1
+                                              ),
+                                            } as CartItem)
+                                          : x
+                                      )
                                     )
-                                  )
+                                  }
+                                >
+                                  −
+                                </button>
+                                <input
+                                  type="number"
+                                  className="w-16 px-2 py-1 border rounded text-center dark:bg-gray-900 dark:border-gray-700"
+                                  min={1}
+                                  max={n.max}
+                                  value={n.quantity}
+                                  onChange={(e) => {
+                                    const raw = parseInt(e.target.value || "1", 10);
+                                    const val = Math.max(
+                                      1,
+                                      Math.min(n.max, isNaN(raw) ? 1 : raw)
+                                    );
+                                    setCart((prev) =>
+                                      prev.map((x, i) =>
+                                        i === idx
+                                          ? ({ ...(x as CartNonPM), quantity: val } as CartItem)
+                                          : x
+                                      )
+                                    );
+                                  }}
+                                />
+                                <button
+                                  className="px-2 py-1 rounded border dark:border-gray-700"
+                                  onClick={() =>
+                                    setCart((prev) =>
+                                      prev.map((x, i) =>
+                                        i === idx
+                                          ? ({
+                                              ...(x as CartNonPM),
+                                              quantity: Math.min(
+                                                (x as CartNonPM).max,
+                                                (x as CartNonPM).quantity + 1
+                                              ),
+                                            } as CartItem)
+                                          : x
+                                      )
+                                    )
+                                  }
+                                >
+                                  ＋
+                                </button>
+                                <span className="text-xs text-gray-500">/ 最多 {n.max}</span>
+                              </div>
+                              <button
+                                className="px-2 py-1 text-xs rounded bg-red-600 text-white"
+                                onClick={() =>
+                                  setCart((prev) => prev.filter((_, i) => i !== idx))
                                 }
                               >
-                                −
+                                移除
                               </button>
-                              <input
-                                type="number"
-                                className="w-16 px-2 py-1 border rounded text-center dark:bg-gray-900 dark:border-gray-700"
-                                min={1}
-                                max={n.max}
-                                value={n.quantity}
-                                onChange={(e) => {
-                                  const raw = parseInt(e.target.value || "1", 10);
-                                  const val = Math.max(1, Math.min(n.max, isNaN(raw) ? 1 : raw));
-                                  setCart((prev) =>
-                                    prev.map((x, i) =>
-                                      i === idx
-                                        ? ({ ...(x as CartNonPM), quantity: val } as CartItem)
-                                        : x
-                                    )
-                                  );
-                                }}
-                              />
-                              <button
-                                className="px-2 py-1 rounded border dark:border-gray-700"
-                                onClick={() =>
-                                  setCart((prev) =>
-                                    prev.map((x, i) =>
-                                      i === idx
-                                        ? ({
-                                            ...(x as CartNonPM),
-                                            quantity: Math.min(
-                                              (x as CartNonPM).max,
-                                              (x as CartNonPM).quantity + 1
-                                            ),
-                                          } as CartItem)
-                                        : x
-                                    )
-                                  )
-                                }
-                              >
-                                ＋
-                              </button>
-                              <span className="text-xs text-gray-500">/ 最多 {n.max}</span>
                             </div>
-                            <button
-                              className="px-2 py-1 text-xs rounded bg-red-600 text-white"
-                              onClick={() =>
-                                setCart((prev) => prev.filter((_, i) => i !== idx))
-                              }
-                            >
-                              移除
-                            </button>
-                          </div>
-                        );
-                      }
-                    })}
+                          );
+                        })()
+                      )
+                    )}
                   </div>
                 )}
               </div>
@@ -627,7 +569,7 @@ export default function DiscardedModal({
                     className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700"
                     value={operator}
                     onChange={(e) => setOperator(e.target.value)}
-                    placeholder="labAdmin"
+                    placeholder="LabAdmin"
                   />
                 </div>
               </div>
@@ -652,7 +594,7 @@ export default function DiscardedModal({
         )}
       </div>
 
-      {/* confirm modal */}
+      {/* 確認彈窗 */}
       {confirmOpen && (
         <div className="fixed inset-0 z-[1000] bg-black/50 flex items-center justify-center p-4">
           <div className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-2xl p-5">
@@ -685,13 +627,17 @@ export default function DiscardedModal({
                       .filter((c) => c.type === "non")
                       .map((c, i) => {
                         const n = c as CartNonPM;
-                        const p = productMap.get(n.productId);
+                        const src = allNon.find(
+                          (g) =>
+                            g.productId === n.productId &&
+                            g.locationId === n.locationId &&
+                            g.currentStatus === n.currentStatus
+                        );
                         return (
                           <li key={`cnon-${i}`}>
-                            {p?.name}/{p?.model}/{p?.brand} ·{" "}
-                            {locLabelMap.get(n.locationId) || n.locationId} ·{" "}
-                            status: {n.currentStatus} · qty: <b>{n.quantity}</b>{" "}
-                            (最多 {n.max})
+                            {src?.product.name}/{src?.product.model}/{src?.product.brand} ·{" "}
+                            {src?.locationPath.join(" → ") || n.locationId} · status: {n.currentStatus} · qty:{" "}
+                            <b>{n.quantity}</b> (最多 {n.max})
                           </li>
                         );
                       })}

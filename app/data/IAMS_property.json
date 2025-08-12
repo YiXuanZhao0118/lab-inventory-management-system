@@ -1,13 +1,5 @@
 [
   {
-    "stockid": "88b3b644-b645-4403-91b6-0e814c38238b",
-    "IAMSID": "123"
-  },
-  {
-    "stockid": "d3c0904a-feef-4541-832c-8e2b468f11a8",
-    "IAMSID": "Test"
-  },
-  {
     "stockid": "4ea3886b-6ba0-4ecc-9a74-37cb8321c6b4",
     "IAMSID": "4031404030020267"
   },
@@ -58,10 +50,6 @@
   {
     "stockid": "b2d209f1-c674-42a7-be63-f8945881b424",
     "IAMSID": "3100505-0011-0002106"
-  },
-  {
-    "stockid": "36c2ff7c-bca3-4109-a728-15885e2163f0",
-    "IAMSID": ""
   },
   {
     "stockid": "8e829c76-dd1f-44a7-a312-9052f09ff191",
@@ -381,14 +369,10 @@
   },
   {
     "stockid": "eccd5bcc-9952-44ed-a5c0-1c7bb301db41",
-    "IAMSID": "PD0009"
+    "IAMSID": "PD009"
   },
   {
     "stockid": "d27e9007-ffe3-4712-a185-fb3da8bdbe36",
     "IAMSID": "3120303-0001-0002286"
-  },
-  {
-    "stockid": "e35eec01-d461-4de7-9f0b-84c2ff077b8f",
-    "IAMSID": ""
   }
 ]

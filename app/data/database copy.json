@@ -966,7 +966,7 @@
     {
       "id": "94a56462-73db-4ff4-98bd-96e13f41f28d",
       "productId": "36828651-ffa5-4865-a4b5-6d753c805087",
-      "locationId": "174715464671535c3ea65090158",
+      "locationId": "174730746383244bdbc05e19f48",
       "currentStatus": "in_stock",
       "createdAt": "2025-08-09T13:22:02.447Z",
       "discarded": false,
@@ -984,7 +984,7 @@
     {
       "id": "1dbcedcd-49dd-4b69-9d88-194ca8731db4",
       "productId": "36828651-ffa5-4865-a4b5-6d753c805087",
-      "locationId": "1747154646715c766f715a1073",
+      "locationId": "1749193014849b3c35c971867d8",
       "currentStatus": "in_stock",
       "createdAt": "2025-08-09T13:22:02.447Z",
       "discarded": false,
@@ -2645,78 +2645,6 @@
       "createdAt": "2025-08-11T06:17:58.108Z",
       "discarded": false,
       "discardLog": null
-    },
-    {
-      "id": "3da34b8d-f353-4a8c-8729-030add90b19d",
-      "productId": "1a514f9c-42d4-4e29-b468-1165b063bff6",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
-    },
-    {
-      "id": "4aacfe9d-6414-4395-adf8-72d675956140",
-      "productId": "9b85324b-c3d3-4230-845a-d2aa587fa57b",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
-    },
-    {
-      "id": "30395ab7-f3e4-4752-94a1-e456f99b830c",
-      "productId": "9b85324b-c3d3-4230-845a-d2aa587fa57b",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
-    },
-    {
-      "id": "bb2a12c7-b219-432a-80f2-84092339ca89",
-      "productId": "9b85324b-c3d3-4230-845a-d2aa587fa57b",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
-    },
-    {
-      "id": "6b1120a7-c794-4cac-a49a-cbb844bd07f9",
-      "productId": "9b85324b-c3d3-4230-845a-d2aa587fa57b",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
-    },
-    {
-      "id": "0faf1bd8-b167-4743-a938-b47bb885865f",
-      "productId": "9b85324b-c3d3-4230-845a-d2aa587fa57b",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
-    },
-    {
-      "id": "57656e28-d58e-4621-8b45-a7ea50185407",
-      "productId": "e0018a6d-9130-4f22-8c49-d0ca62225b75",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
-    },
-    {
-      "id": "0dbc4cff-f250-45a8-afc1-806f4435fae3",
-      "productId": "e0018a6d-9130-4f22-8c49-d0ca62225b75",
-      "locationId": "1",
-      "currentStatus": "in_stock",
-      "createdAt": "2025-08-12T11:57:03.279Z",
-      "discarded": false,
-      "discardLog": null
     }
   ],
   "products": [
@@ -2728,19 +2656,7 @@
       "specifications": "750 - 1650 nm, 40 kHz - 10 GHz, FC/PC",
       "imageLink": "https://www.thorlabs.com/images/large/TTN216771-lrg.jpg",
       "localImage": "/product_images/1a514f9c-42d4-4e29-b468-1165b063bff6.jpg",
-      "isPropertyManaged": true,
-      "price": 4927.67
-    },
-    {
-      "id": "1cb69872-ad5b-4fbb-ac19-e795686824cd",
-      "name": "10:90 (R:T) Non-Polarizing Beamsplitter Cube",
-      "model": "BS026",
-      "brand": "Thorlabs",
-      "specifications": "700 - 1100 nm, 1”",
-      "imageLink": "https://www.thorlabs.com/images/large/CTN020913-lrg.jpg",
-      "localImage": "/product_images/1cb69872-ad5b-4fbb-ac19-e795686824cd.jpg",
-      "isPropertyManaged": true,
-      "price": 268.2
+      "isPropertyManaged": true
     },
     {
       "id": "9b85324b-c3d3-4230-845a-d2aa587fa57b",
@@ -2750,8 +2666,7 @@
       "specifications": "-",
       "imageLink": "https://www.thorlabs.com/images/large/TTN236817-lrg.jpg",
       "localImage": "/product_images/9b85324b-c3d3-4230-845a-d2aa587fa57b.jpg",
-      "isPropertyManaged": false,
-      "price": 17.55
+      "isPropertyManaged": false
     },
     {
       "id": "36828651-ffa5-4865-a4b5-6d753c805087",
@@ -2761,52 +2676,27 @@
       "specifications": "-",
       "imageLink": "https://www.thorlabs.com/images/obsolete/6384-std.jpg",
       "localImage": "/product_images/36828651-ffa5-4865-a4b5-6d753c805087.jpg",
-      "isPropertyManaged": false,
-      "price": 17.55
+      "isPropertyManaged": false
+    },
+    {
+      "id": "14f34ef2-cce6-41ee-b17b-1b6584cfbbb4",
+      "name": "30:70 Economy Beamsplitters",
+      "brand": "Thorlabs",
+      "model": "EBP1",
+      "specifications": "Ø1\", AOI: 45°",
+      "imageLink": "https://www.thorlabs.com/images/large/10666-lrg.jpg",
+      "localImage": "/product_images/14f34ef2-cce6-41ee-b17b-1b6584cfbbb4.jpg",
+      "isPropertyManaged": false
     },
     {
       "id": "d6b6ef85-132f-49c8-8c22-85abda5d325a",
       "name": "50:50 Non-Polarizing Beamsplitter Cube",
       "brand": "Thorlabs",
       "model": "BS005",
-      "specifications": "700 - 1100 nm, 1/2”",
+      "specifications": "700 - 1100 nm, 1/2\"",
       "imageLink": "https://www.thorlabs.com/images/large/24809-lrg.jpg",
       "localImage": "/product_images/d6b6ef85-132f-49c8-8c22-85abda5d325a.jpg",
-      "isPropertyManaged": false,
-      "price": 227.52
-    },
-    {
-      "id": "63a0e8f5-3ff4-42cc-9288-099d4760bc4c",
-      "name": "50:50 Non-Polarizing Beamsplitter Cube",
-      "model": "BS011",
-      "brand": "Thorlabs",
-      "specifications": "700 - 1100 nm, 10 mm",
-      "imageLink": "https://www.thorlabs.com/images/large/3616-lrg.jpg",
-      "localImage": "/product_images/63a0e8f5-3ff4-42cc-9288-099d4760bc4c.jpg",
-      "isPropertyManaged": true,
-      "price": 219.89
-    },
-    {
-      "id": "85ac7de1-8af2-443b-a96e-1d0dd22da49e",
-      "name": "70:30 (R:T) Non-Polarizing Beamsplitter Cube",
-      "model": "BS059",
-      "brand": "Thorlabs",
-      "specifications": "700 - 1100 nm, 10 mm",
-      "imageLink": "https://www.thorlabs.com/images/large/TTN140592-lrg.jpg",
-      "localImage": "/product_images/85ac7de1-8af2-443b-a96e-1d0dd22da49e.jpg",
-      "isPropertyManaged": true,
-      "price": 219.89
-    },
-    {
-      "id": "c46d7671-be98-48b5-b714-c7267bf002e9",
-      "name": "90:10 (R:T) Non-Polarizing Beamsplitter Cube",
-      "model": "BS029",
-      "brand": "Thorlabs",
-      "specifications": "700 - 1100 nm, 1”",
-      "imageLink": "https://www.thorlabs.com/images/large/23278-lrg.jpg",
-      "localImage": "/product_images/c46d7671-be98-48b5-b714-c7267bf002e9.jpg",
-      "isPropertyManaged": true,
-      "price": 268.2
+      "isPropertyManaged": false
     },
     {
       "id": "97e97711-2594-4af9-97ba-046cdec4f919",
@@ -2826,8 +2716,47 @@
       "specifications": "±200 mA HV",
       "imageLink": "https://www.thorlabs.com/images/large/14198-lrg.jpg",
       "localImage": "/product_images/1c02a260-9cfb-4bcf-9f24-524cfb68ded7.jpg",
-      "isPropertyManaged": true,
-      "price": 1295.03
+      "isPropertyManaged": true
+    },
+    {
+      "id": "c2915e88-0de5-4fb6-8434-e421a91a1474",
+      "name": "Broadband Dielectric Mirror",
+      "brand": "Thorlabs",
+      "model": "BB1-E01",
+      "specifications": "Ø1, 350 - 400 nm",
+      "imageLink": "https://www.thorlabs.com/images/large/3538-lrg.jpg",
+      "localImage": "/product_images/c2915e88-0de5-4fb6-8434-e421a91a1474.jpg",
+      "isPropertyManaged": false
+    },
+    {
+      "id": "f8691b41-a817-40b5-a1f8-1fa601585cbe",
+      "name": "Broadband Dielectric Mirror",
+      "model": "BB1-E03",
+      "brand": "Thorlabs",
+      "specifications": "Ø1\", 750 - 1100 nm",
+      "imageLink": "https://www.thorlabs.com/images/large/3544-lrg.jpg",
+      "localImage": "/product_images/f8691b41-a817-40b5-a1f8-1fa601585cbe.jpg",
+      "isPropertyManaged": false
+    },
+    {
+      "id": "a71cad2a-a27c-44ab-81ed-b76120353d79",
+      "name": "Broadband Dielectric Mirror",
+      "model": "BB05-E03",
+      "brand": "Thorlabs",
+      "specifications": "Ø1/2\", 750 - 1100 nm",
+      "imageLink": "https://www.thorlabs.com/images/large/3543-lrg.jpg",
+      "localImage": "/product_images/a71cad2a-a27c-44ab-81ed-b76120353d79.jpg",
+      "isPropertyManaged": false
+    },
+    {
+      "id": "c460e788-f6e9-404c-942f-892a439cb6c6",
+      "name": "Broadband Dielectric Mirror",
+      "brand": "Thorlabs",
+      "model": "BB1-E02",
+      "specifications": "Ø1\", 400 - 750 nm",
+      "imageLink": "https://www.thorlabs.com/images/large/3541-lrg.jpg",
+      "localImage": "/product_images/c460e788-f6e9-404c-942f-892a439cb6c6.jpg",
+      "isPropertyManaged": false
     },
     {
       "id": "472fa924-97fd-42a0-9fda-bdfd2646a1df",
@@ -2868,17 +2797,6 @@
       "imageLink": "https://www.thorlabs.com/images/large/20474-lrg.jpg",
       "localImage": "/product_images/e4a3efab-cb07-4b2d-a1fa-78b7b2db500e.jpg",
       "isPropertyManaged": true
-    },
-    {
-      "id": "14f34ef2-cce6-41ee-b17b-1b6584cfbbb4",
-      "name": "Economy 30:70 Beamsplitter",
-      "brand": "Thorlabs",
-      "model": "EBP1",
-      "specifications": "Ø1\", AOI: 45°",
-      "imageLink": "https://www.thorlabs.com/images/large/10666-lrg.jpg",
-      "localImage": "/product_images/14f34ef2-cce6-41ee-b17b-1b6584cfbbb4.jpg",
-      "isPropertyManaged": false,
-      "price": 41
     },
     {
       "id": "4f436e2b-522a-4f04-8fa3-e137a3021a52",
@@ -2982,25 +2900,13 @@
     },
     {
       "id": "3911d3d4-466c-4286-82da-b6f768a7d0f9",
-      "name": "Mounted Aspheric Lens",
+      "name": "Mounted Aspheric Lens(Collimator)",
       "model": "A110TM-A",
       "brand": "Thorlabs",
-      "specifications": "NA = 0.40, WD = 2.39 mm, ARC: 350 - 700 nm, f = 6.24 mm",
+      "specifications": "f = 6.24 mm, NA = 0.40, WD = 2.39 mm,ARC: 350 - 700 nm",
       "imageLink": "https://www.thorlabs.com/images/large/15809-lrg.jpg",
       "localImage": "/product_images/3911d3d4-466c-4286-82da-b6f768a7d0f9.jpg",
-      "isPropertyManaged": true,
-      "price": 105.82
-    },
-    {
-      "id": "dbb14b25-0190-48ce-a192-31986b2c5fd5",
-      "name": "Mounted Aspheric Lens",
-      "brand": "Thorlabs",
-      "model": "A240TM-B",
-      "specifications": "NA = 0.50, WD = 4.79 mm, ARC: 650 - 1050 nm, f= 8.00mm",
-      "price": 105.82,
-      "imageLink": "https://www.thorlabs.com/images/xlarge/15818-xl.jpg",
-      "localImage": "/product_images/dbb14b25-0190-48ce-a192-31986b2c5fd5.jpg",
-      "isPropertyManaged": false
+      "isPropertyManaged": true
     },
     {
       "id": "5b752eb3-d521-47c2-bb4a-5cc4a6520dbe",
@@ -3010,8 +2916,7 @@
       "specifications": "750 - 1650 nm, DC - 15 GHz, FC/PC",
       "imageLink": "https://www.thorlabs.com/images/large/TTN339101-lrg.jpg",
       "localImage": "/product_images/5b752eb3-d521-47c2-bb4a-5cc4a6520dbe.jpg",
-      "isPropertyManaged": true,
-      "price": 6206
+      "isPropertyManaged": true
     },
     {
       "id": "e4503337-7903-4126-886f-48c07f92361f",
@@ -3021,8 +2926,7 @@
       "specifications": "750 - 1650 nm, 500 kHz - 25 GHz, FC/PC",
       "imageLink": "https://www.thorlabs.com/images/large/TTN204727-lrg.jpg",
       "localImage": "/product_images/e4503337-7903-4126-886f-48c07f92361f.jpg",
-      "isPropertyManaged": true,
-      "price": 7448.81
+      "isPropertyManaged": true
     },
     {
       "id": "e5a492d7-33ba-4d17-86b1-f44ec8a399d7",
@@ -3265,15 +3169,44 @@
       "isPropertyManaged": false
     },
     {
-      "id": "dcc5afed-1ea1-4aa8-9b37-eb690ce2e47c",
-      "name": "Nexus Breadboard",
-      "model": "B3045A",
+      "id": "63a0e8f5-3ff4-42cc-9288-099d4760bc4c",
+      "name": "Non-Polarizing Beamsplitter Cube",
+      "model": "BS011",
       "brand": "Thorlabs",
-      "specifications": "300 mm x 450 mm x 60 mm, M6 x 1.0 Mounting Holes",
-      "imageLink": "https://www.thorlabs.com/images/large/25473-lrg.jpg",
-      "localImage": "/product_images/dcc5afed-1ea1-4aa8-9b37-eb690ce2e47c.jpg",
-      "isPropertyManaged": true,
-      "price": 808.63
+      "specifications": "50:50, 700 - 1100 nm, 10 mm",
+      "imageLink": "https://www.thorlabs.com/images/large/3616-lrg.jpg",
+      "localImage": "/product_images/63a0e8f5-3ff4-42cc-9288-099d4760bc4c.jpg",
+      "isPropertyManaged": true
+    },
+    {
+      "id": "1cb69872-ad5b-4fbb-ac19-e795686824cd",
+      "name": "Non-Polarizing Beamsplitter Cube",
+      "model": "BS026",
+      "brand": "Thorlabs",
+      "specifications": "10:90 (R:T), 700 - 1100 nm, 1\"",
+      "imageLink": "https://www.thorlabs.com/images/large/CTN020913-lrg.jpg",
+      "localImage": "/product_images/1cb69872-ad5b-4fbb-ac19-e795686824cd.jpg",
+      "isPropertyManaged": true
+    },
+    {
+      "id": "c46d7671-be98-48b5-b714-c7267bf002e9",
+      "name": "Non-Polarizing Beamsplitter Cube",
+      "model": "BS029",
+      "brand": "Thorlabs",
+      "specifications": "90:10 (R:T), 700 - 1100 nm, 1\"",
+      "imageLink": "https://www.thorlabs.com/images/large/23278-lrg.jpg",
+      "localImage": "/product_images/c46d7671-be98-48b5-b714-c7267bf002e9.jpg",
+      "isPropertyManaged": true
+    },
+    {
+      "id": "85ac7de1-8af2-443b-a96e-1d0dd22da49e",
+      "name": "Non-Polarizing Beamsplitter Cube",
+      "model": "BS059",
+      "brand": "Thorlabs",
+      "specifications": "70:30 (R:T), 700 - 1100 nm, 10 mm",
+      "imageLink": "https://www.thorlabs.com/images/large/TTN140592-lrg.jpg",
+      "localImage": "/product_images/85ac7de1-8af2-443b-a96e-1d0dd22da49e.jpg",
+      "isPropertyManaged": true
     },
     {
       "id": "a0386bd1-ee2b-430a-8c86-42a9a0f97f0d",
@@ -3363,8 +3296,7 @@
       "specifications": "Temperature Compensated, 400 - 1000 nm, 1 - 1600 MHz, M4 Tap",
       "imageLink": "https://www.thorlabs.com/images/large/7733-lrg.jpg",
       "localImage": "/product_images/68158f78-ad82-4d27-8811-6f30daa1da74.jpg",
-      "isPropertyManaged": true,
-      "price": 2497.25
+      "isPropertyManaged": true
     },
     {
       "id": "aba2ddc3-a605-48ef-8d41-1b420dd7b8b0",
@@ -3424,8 +3356,7 @@
       "specifications": "0.35\" Thick, 2 Retaining Rings, M4 Tap",
       "imageLink": "https://www.thorlabs.com/images/large/440-lrg.jpg",
       "localImage": "/product_images/90398be8-fda7-4be1-94e8-f76221838e6e.jpg",
-      "isPropertyManaged": true,
-      "price": 20.43
+      "isPropertyManaged": true
     },
     {
       "id": "5d27af2c-4197-47d1-a687-2e259b74419f",
@@ -3435,8 +3366,7 @@
       "specifications": "0.35\" Thick, 2 Retaining Rings, M4 Tap",
       "imageLink": "https://www.thorlabs.com/images/large/TTN189114-lrg.jpg",
       "localImage": "/product_images/5d27af2c-4197-47d1-a687-2e259b74419f.jpg",
-      "isPropertyManaged": false,
-      "price": 20.43
+      "isPropertyManaged": false
     },
     {
       "id": "be4c85ff-2792-46d2-8a76-f9edd38ffbbc",
@@ -3499,6 +3429,26 @@
       "isPropertyManaged": true
     },
     {
+      "id": "a5070370-143e-43a2-b839-2a1a2c56fa58",
+      "name": "UVFS Beam Sampler for Beam Pick-Off",
+      "model": "BSF10-A",
+      "brand": "Thorlabs",
+      "specifications": "Ø1\" , ARC: 350-700 nm, 5 mm Thick",
+      "imageLink": "https://www.thorlabs.com/images/large/19936-lrg.jpg",
+      "localImage": "/product_images/a5070370-143e-43a2-b839-2a1a2c56fa58.jpg",
+      "isPropertyManaged": true
+    },
+    {
+      "id": "045995a3-7951-4937-957c-c3c646ceb32b",
+      "name": "UVFS Plate Beamsplitter",
+      "model": "BSW28",
+      "brand": "Thorlabs",
+      "specifications": "Ø1/2\" 50:50, Coating: 600 - 1700 nm, t = 3.0 mm",
+      "imageLink": "https://www.thorlabs.com/images/large/23985-lrg.jpg",
+      "localImage": "/product_images/045995a3-7951-4937-957c-c3c646ceb32b.jpg",
+      "isPropertyManaged": true
+    },
+    {
       "id": "6c03aed1-4ffb-4679-852c-2b47552c6863",
       "name": "Z-Axis Translation Mount",
       "brand": "Thorlabs",
@@ -3509,17 +3459,6 @@
       "isPropertyManaged": false
     },
     {
-      "id": "91513618-f094-4764-ace0-eb9e252f37e5",
-      "name": "Z-Axis Translation Mount",
-      "brand": "Thorlabs",
-      "model": "SM1ZA",
-      "specifications": "30 mm Cage Compatible",
-      "price": 235.61,
-      "imageLink": "https://www.thorlabs.com/images/xlarge/TTN210444-xl.jpg",
-      "localImage": "/product_images/91513618-f094-4764-ace0-eb9e252f37e5.jpg",
-      "isPropertyManaged": false
-    },
-    {
       "id": "a537444f-6b00-401e-a0a8-0f540173a6dc",
       "name": "30 mm Cage Plate with Ø1\" Double Bore",
       "brand": "Thorlabs",
@@ -3527,8 +3466,7 @@
       "specifications": "M4 Tap",
       "imageLink": "https://www.thorlabs.com/images/large/TTN189146-lrg.jpg",
       "localImage": "/product_images/a537444f-6b00-401e-a0a8-0f540173a6dc.jpg",
-      "isPropertyManaged": false,
-      "price": 23.04
+      "isPropertyManaged": false
     },
     {
       "id": "74589a0c-9280-41d0-8503-af8928ee7566",
@@ -3538,8 +3476,7 @@
       "specifications": "M4 Tap",
       "imageLink": "https://www.thorlabs.com/images/obsolete/22839-std.jpg",
       "localImage": "/product_images/74589a0c-9280-41d0-8503-af8928ee7566.jpg",
-      "isPropertyManaged": false,
-      "price": 23.04
+      "isPropertyManaged": false
     },
     {
       "id": "25d0e92c-ec4c-4642-aa8c-6cd6ce094abc",
@@ -3652,6 +3589,16 @@
       "isPropertyManaged": true
     },
     {
+      "id": "dcc5afed-1ea1-4aa8-9b37-eb690ce2e47c",
+      "name": "光學麵包板 Nexus Breadboard",
+      "model": "B3045A",
+      "brand": "Thorlabs",
+      "specifications": "300 mm x 450 mm x 60 mm, M6 x 1.0 Mounting Holes",
+      "imageLink": "https://www.thorlabs.com/images/large/25473-lrg.jpg",
+      "localImage": "/product_images/dcc5afed-1ea1-4aa8-9b37-eb690ce2e47c.jpg",
+      "isPropertyManaged": true
+    },
+    {
       "id": "0e08a2f7-ea33-45c9-a0ed-d1f891169e38",
       "name": "光學頻譜分析儀 Fourier Transform Optical Spectrum Analyzer",
       "model": "OSA201",
@@ -3722,39 +3669,6 @@
       "isPropertyManaged": true
     },
     {
-      "id": "c2915e88-0de5-4fb6-8434-e421a91a1474",
-      "name": "Ø1” Broadband Dielectric Mirror",
-      "brand": "Thorlabs",
-      "model": "BB1-E01",
-      "specifications": "350 - 400 nm",
-      "imageLink": "https://www.thorlabs.com/images/large/3538-lrg.jpg",
-      "localImage": "/product_images/c2915e88-0de5-4fb6-8434-e421a91a1474.jpg",
-      "isPropertyManaged": false,
-      "price": 162.69
-    },
-    {
-      "id": "f8691b41-a817-40b5-a1f8-1fa601585cbe",
-      "name": "Ø1” Broadband Dielectric Mirror",
-      "model": "BB1-E03",
-      "brand": "Thorlabs",
-      "specifications": "750 - 1100 nm",
-      "imageLink": "https://www.thorlabs.com/images/large/3544-lrg.jpg",
-      "localImage": "/product_images/f8691b41-a817-40b5-a1f8-1fa601585cbe.jpg",
-      "isPropertyManaged": false,
-      "price": 86.91
-    },
-    {
-      "id": "c460e788-f6e9-404c-942f-892a439cb6c6",
-      "name": "Ø1” Broadband Dielectric Mirror",
-      "brand": "Thorlabs",
-      "model": "BB1-E02",
-      "specifications": "400 - 750 nm",
-      "imageLink": "https://www.thorlabs.com/images/large/3541-lrg.jpg",
-      "localImage": "/product_images/c460e788-f6e9-404c-942f-892a439cb6c6.jpg",
-      "isPropertyManaged": false,
-      "price": 86.91
-    },
-    {
       "id": "e62737ab-706a-4be8-af80-b3fc2c0c442d",
       "name": "Ø1\" FC/APC Fiber Adapter Plate Without Threads",
       "brand": "Thorlabs",
@@ -3772,50 +3686,6 @@
       "specifications": "Wide Key (2.2 mm)",
       "imageLink": "https://www.thorlabs.com/images/large/TTN024791-lrg.jpg",
       "localImage": "/product_images/8415b567-b2b0-4d33-9f8c-b2fc319829ed.jpg",
-      "isPropertyManaged": false
-    },
-    {
-      "id": "a5070370-143e-43a2-b839-2a1a2c56fa58",
-      "name": "Ø1” UVFS Beam Sampler for Beam Pick-Off",
-      "model": "BSF10-A",
-      "brand": "Thorlabs",
-      "specifications": "ARC: 350-700 nm, 5 mm Thick",
-      "imageLink": "https://www.thorlabs.com/images/large/19936-lrg.jpg",
-      "localImage": "/product_images/a5070370-143e-43a2-b839-2a1a2c56fa58.jpg",
-      "isPropertyManaged": true,
-      "price": 79.77
-    },
-    {
-      "id": "045995a3-7951-4937-957c-c3c646ceb32b",
-      "name": "Ø1/2” 50:50 UVFS Plate Beamsplitter",
-      "model": "BSW28",
-      "brand": "Thorlabs",
-      "specifications": "Coating: 600 - 1700 nm, t = 3.0 mm",
-      "imageLink": "https://www.thorlabs.com/images/large/23985-lrg.jpg",
-      "localImage": "/product_images/045995a3-7951-4937-957c-c3c646ceb32b.jpg",
-      "isPropertyManaged": true,
-      "price": 98.18
-    },
-    {
-      "id": "a71cad2a-a27c-44ab-81ed-b76120353d79",
-      "name": "Ø1/2” Broadband Dielectric Mirror",
-      "model": "BB05-E03",
-      "brand": "Thorlabs",
-      "specifications": "750 - 1100 nm",
-      "imageLink": "https://www.thorlabs.com/images/large/3543-lrg.jpg",
-      "localImage": "/product_images/a71cad2a-a27c-44ab-81ed-b76120353d79.jpg",
-      "isPropertyManaged": false,
-      "price": 59.61
-    },
-    {
-      "id": "5c28b515-5a5f-4400-bca2-5311d6903eba",
-      "name": "Ø3” Broadband Dielectric Mirror",
-      "brand": "Thorlabs",
-      "model": "BB3-E02",
-      "specifications": "400 - 750 nm",
-      "price": 463.88,
-      "imageLink": "https://www.thorlabs.com/images/xlarge/18642-xl.jpg",
-      "localImage": "/product_images/5c28b515-5a5f-4400-bca2-5311d6903eba.jpg",
       "isPropertyManaged": false
     },
     {
@@ -3913,11 +3783,10 @@
       "name": "SM1-Threaded Adapter for Ø11 mm",
       "brand": "Thorlabs",
       "model": "AD11F",
-      "specifications": "≥0.35” (8.9 mm) Long Cylindrical Components",
+      "specifications": "≥0.35\" (8.9 mm) Long Cylindrical Components",
       "imageLink": "https://www.thorlabs.com/images/large/2314-lrg.jpg",
       "localImage": "/product_images/812c4c18-3af9-45d1-93d9-5e10bf205bfa.jpg",
-      "isPropertyManaged": false,
-      "price": 36.22
+      "isPropertyManaged": false
     },
     {
       "id": "9033318c-fb7a-4a7a-8861-c637975e7e06",
@@ -3927,8 +3796,7 @@
       "specifications": "≥0.35\" (8.9 mm) Long Cylindrical Components",
       "imageLink": "https://www.thorlabs.com/images/large/13220-lrg.jpg",
       "localImage": "/product_images/9033318c-fb7a-4a7a-8861-c637975e7e06.jpg",
-      "isPropertyManaged": false,
-      "price": 37.5
+      "isPropertyManaged": false
     },
     {
       "id": "b714727a-7b7a-4508-950b-f2b2b506aaa3",
@@ -3938,19 +3806,17 @@
       "specifications": "≥0.35\" (8.9 mm) Long Cylindrical Components",
       "imageLink": "https://www.thorlabs.com/images/large/6205-lrg.jpg",
       "localImage": "/product_images/b714727a-7b7a-4508-950b-f2b2b506aaa3.jpg",
-      "isPropertyManaged": false,
-      "price": 38.77
+      "isPropertyManaged": false
     },
     {
       "id": "9961671c-8bf2-45b8-b7c5-27e6f55bd6ad",
       "name": "SM1-Threaded Adapter for Ø9.5 mm",
       "brand": "Thorlabs",
       "model": "AD9.5F",
-      "specifications": "≥0.18” (4.6 mm) Long Cylindrical Components",
+      "specifications": "≥0.18\" (4.6 mm) Long Cylindrical Components ",
       "imageLink": "https://www.thorlabs.com/images/large/17873-lrg.jpg",
       "localImage": "/product_images/9961671c-8bf2-45b8-b7c5-27e6f55bd6ad.jpg",
-      "isPropertyManaged": false,
-      "price": 34.64
+      "isPropertyManaged": false
     },
     {
       "id": "11fe2138-57d4-49ff-9120-8ce7f44abcf0",
@@ -8453,6 +8319,39 @@
       "imageLink": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxwrb1Z6V5F3TKN0eQooTEHLKC6wgvKLLY5Q&s",
       "localImage": "/product_images/ab4dd51a-e326-4d8a-b45f-8fe9400525e9.jpg",
       "isPropertyManaged": true
+    },
+    {
+      "id": "5c28b515-5a5f-4400-bca2-5311d6903eba",
+      "name": "Ø3” Broadband Dielectric Mirror",
+      "brand": "Thorlabs",
+      "model": "BB3-E02",
+      "specifications": "400 - 750 nm",
+      "price": 463.88,
+      "imageLink": "https://www.thorlabs.com/images/xlarge/18642-xl.jpg",
+      "localImage": "/product_images/5c28b515-5a5f-4400-bca2-5311d6903eba.jpg",
+      "isPropertyManaged": false
+    },
+    {
+      "id": "dbb14b25-0190-48ce-a192-31986b2c5fd5",
+      "name": "Mounted Aspheric Lens",
+      "brand": "Thorlabs",
+      "model": "A240TM-B",
+      "specifications": "NA = 0.50, WD = 4.79 mm, ARC: 650 - 1050 nm, f= 8.00mm",
+      "price": 105.82,
+      "imageLink": "https://www.thorlabs.com/images/xlarge/15818-xl.jpg",
+      "localImage": "/product_images/dbb14b25-0190-48ce-a192-31986b2c5fd5.jpg",
+      "isPropertyManaged": false
+    },
+    {
+      "id": "91513618-f094-4764-ace0-eb9e252f37e5",
+      "name": "Z-Axis Translation Mount",
+      "brand": "Thorlabs",
+      "model": "SM1ZA",
+      "specifications": "30 mm Cage Compatible",
+      "price": 235.61,
+      "imageLink": "https://www.thorlabs.com/images/xlarge/TTN210444-xl.jpg",
+      "localImage": "/product_images/91513618-f094-4764-ace0-eb9e252f37e5.jpg",
+      "isPropertyManaged": false
     }
   ],
   "locationTree": [
@@ -9011,8 +8910,8 @@
       "label": "Unknown"
     },
     {
-      "id": "1",
-      "label": "Order Verification Area"
+      "id": "1754895496678fad2440bf4db2",
+      "label": "Container Area"
     }
   ]
 }

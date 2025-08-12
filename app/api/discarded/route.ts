@@ -30,29 +30,95 @@ type NewPayload = { reason: string; operator: string; items: Array<NewSingle | N
 
 const VALID_STATUSES = new Set(['in_stock', 'short_term', 'long_term'])
 
-// ✅ 新增：GET（提供 Discarded 頁面用）
-// - 預設回傳 in_stock/short_term/long_term 且未報廢的庫存
-// - 可用 ?statuses=in_stock,long_term 來指定（可選）
-export async function GET(request: Request) {
-  const url = new URL(request.url)
-  const statusesParam = url.searchParams.get('statuses') // e.g. 'in_stock,long_term'
-  const allowed = statusesParam
-    ? statusesParam
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => VALID_STATUSES.has(s))
-    : Array.from(VALID_STATUSES)
+export async function GET() {
+  try {
+    const stock = getStock() as StockItem[];
+    const locations = getLocationTree?.() ?? [];
 
-  const stock = getStock() as StockItem[]
-  const products = getProducts?.() ?? []
-  const locations = getLocationTree?.() ?? []
+    // build locationId -> path
+    const id2Path = new Map<string, string[]>();
+    const dfs = (node: any, trail: string[]) => {
+      const next = [...trail, node.label];
+      id2Path.set(node.id, next);
+      node.children?.forEach((c: any) => dfs(c, next));
+    };
+    locations.forEach((root: any) => dfs(root, []));
 
-  const filteredStock = stock.filter(
-    s => !s.discarded && allowed.includes(s.currentStatus as any)
-  )
+    // ✅ 正確加上括號，避免把 long_term（即便已報廢）撈進來
+    const eligible = stock.filter(
+      (s) => !s.discarded && (s.currentStatus === 'in_stock' || s.currentStatus === 'long_term')
+    );
 
-  return NextResponse.json({ stock: filteredStock, products, locations }, { status: 200 })
+    // output shapes
+    type PMItem = {
+      stockId: string;
+      product: { id: string; name: string; model: string; brand: string };
+      locationId: string;
+      locationPath: string[];
+      currentStatus: string;
+    };
+
+    type NonPMGroup = {
+      productId: string;
+      product: { id: string; name: string; model: string; brand: string };
+      locationId: string;
+      locationPath: string[];
+      quantity: number;
+      currentStatus: string; // <= 關鍵：保留群組的狀態
+    };
+
+    const pm: PMItem[] = [];
+    // ✅ key 加上 currentStatus，避免不同狀態被合併
+    const nonMap = new Map<string, NonPMGroup>(); // key = productId::locationId::currentStatus
+
+    for (const s of eligible) {
+      const p = getProductById(s.productId);
+      if (!p) continue;
+
+      const locationPath = id2Path.get(s.locationId) ?? [];
+
+      if (p.isPropertyManaged) {
+        pm.push({
+          stockId: s.id,
+          product: { id: p.id, name: p.name, model: p.model, brand: p.brand },
+          locationId: s.locationId,
+          locationPath,
+          currentStatus: s.currentStatus,
+        });
+      } else {
+        const key = `${p.id}::${s.locationId}::${s.currentStatus}`; // ✅ 狀態也進 key
+        const g = nonMap.get(key);
+        if (g) {
+          g.quantity += 1;
+        } else {
+          nonMap.set(key, {
+            productId: p.id,
+            product: { id: p.id, name: p.name, model: p.model, brand: p.brand },
+            locationId: s.locationId,
+            locationPath,
+            quantity: 1,
+            currentStatus: s.currentStatus,
+          });
+        }
+      }
+    }
+
+    pm.sort((a, b) => a.product.name.localeCompare(b.product.name));
+    const nonPropertyManaged = Array.from(nonMap.values()).sort((a, b) =>
+      a.product.name.localeCompare(b.product.name)
+    );
+
+    return NextResponse.json({
+      propertyManaged: pm,
+      nonPropertyManaged,
+      locations,
+    });
+  } catch (err: any) {
+    console.error('Transfers GET error:', err?.message || err);
+    return NextResponse.json({ error: 'Failed to load transfers data' }, { status: 500 });
+  }
 }
+
 
 export async function POST(request: Request) {
   let body: unknown

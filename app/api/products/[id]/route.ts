@@ -1,5 +1,6 @@
 // app/api/products/[id]/route.ts
 export const runtime = "nodejs";
+import { sortProductsInPlace } from "@/components/sortProducts";
 
 import { NextResponse, NextRequest } from "next/server";
 import path from "path";
@@ -139,6 +140,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
     products[idx] = next;
     saveProducts(products);
+    await sortProductsInPlace();
 
     return NextResponse.json({ product: next, downloadOk });
   } catch (err: any) {
@@ -167,6 +169,7 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
 
     const next = products.filter((p) => p.id !== id);
     saveProducts(next);
+    await sortProductsInPlace();
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

@@ -59,36 +59,55 @@ type CartNonPM = {
 
 type CartItem = CartPM | CartNonPM;
 
-
 /** 把地點樹攤平成下拉清單可用的 {id, pathLabel} */
 function flattenLocations(roots: LocationNode[]) {
-  const list: { id: string; path: string[]; label: string }[] = [];
+  const list: { id: string; path: string[]; label: string; isLeaf: boolean }[] = [];
   const walk = (n: LocationNode, trail: string[]) => {
     const next = [...trail, n.label];
-    list.push({ id: n.id, path: next, label: next.join(' → ') });
+    const isLeaf = !n.children || n.children.length === 0;
+    list.push({ id: n.id, path: next, label: next.join(' → '), isLeaf });
     n.children?.forEach(c => walk(c, next));
   };
   roots.forEach(r => walk(r, []));
   return list;
 }
 
-/** 可拖曳的卡片（財產 or 非財產） */
+/** 可拖曳卡片 + 右側加入按鈕；拖拉把手獨立在左邊避免誤觸 */
 function DraggableCard({
   id,
   children,
+  onAdd,
 }: {
   id: string;
   children: React.ReactNode;
+  onAdd: () => void;
 }) {
   const { attributes, listeners, setNodeRef } = useDraggable({ id });
   return (
     <div
       ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 p-3 shadow-sm cursor-grab active:cursor-grabbing select-none"
+      className="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 p-3 shadow-sm flex items-start justify-between gap-3"
     >
-      {children}
+      {/* drag handle */}
+      <div
+        className="shrink-0 mt-0.5 px-1 text-gray-400 cursor-grab active:cursor-grabbing select-none"
+        aria-label="拖拉"
+        {...listeners}
+        {...attributes}
+      >
+        ⠿
+      </div>
+
+      <div className="flex-1 min-w-0">{children}</div>
+
+      <button
+        className="shrink-0 px-2 py-1 text-xs rounded bg-indigo-600 hover:bg-indigo-700 text-white"
+        // 防止按鈕點擊被當成拖拉起手
+        onPointerDownCapture={(e) => e.stopPropagation()}
+        onClick={(e) => { e.stopPropagation(); onAdd(); }}
+      >
+        加入
+      </button>
     </div>
   );
 }
@@ -123,7 +142,9 @@ export default function TransfersModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { data, error, mutate } = useSWR<GetResp>('/api/transfers', fetcher);
+  const { data, error, mutate } = useSWR<GetResp>('/api/transfers', fetcher, {
+    revalidateOnFocus: true,
+  });
   const [cart, setCart] = useState<CartItem[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [posting, setPosting] = useState(false);
@@ -154,64 +175,86 @@ export default function TransfersModal({
     );
   }, [data?.nonPropertyManaged, searchNon]);
 
-  // 拖曳開始/結束
+  /** 封裝：加入 PM 一筆（避免重複） */
+  const addPmByStockId = (stockId: string) => {
+    const src = (data?.propertyManaged ?? []).find(i => i.stockId === stockId);
+    if (!src) return;
+    setCart(prev =>
+      prev.some(x => x.type === 'pm' && x.stockId === stockId)
+        ? prev
+        : [
+            ...prev,
+            {
+              type: 'pm',
+              stockId,
+              product: src.product,
+              fromLocation: src.locationId,
+              fromPath: src.locationPath,
+              toLocation: '',
+            },
+          ]
+    );
+  };
+
+  /** 封裝：加入 Non-PM（同產品同來源累加，且不超過 cap） */
+  const addNonByKey = (productId: string, fromLocation: string) => {
+    const src = (data?.nonPropertyManaged ?? []).find(i => i.productId === productId && i.locationId === fromLocation);
+    if (!src) return;
+    setCart(prev => {
+      const idx = prev.findIndex(
+        x => x.type === 'non' && (x as CartNonPM).productId === productId && (x as CartNonPM).fromLocation === fromLocation
+      );
+      if (idx >= 0) {
+        const cur = prev[idx] as CartNonPM;
+        if (cur.quantity >= cur.maxQuantity) return prev;
+        const next = [...prev];
+        next[idx] = { ...cur, quantity: Math.min(cur.quantity + 1, src.quantity), maxQuantity: src.quantity };
+        return next;
+        } else {
+        return [
+          ...prev,
+          {
+            type: 'non',
+            productId,
+            product: src.product,
+            fromLocation,
+            fromPath: src.locationPath,
+            toLocation: '',
+            quantity: 1,
+            maxQuantity: src.quantity,
+          } as CartNonPM,
+        ];
+      }
+    });
+  };
+
+  // 拖曳結束 => 呼叫上面的 add helpers
   function handleDragEnd(event: any) {
     const { over, active } = event;
     if (!over || over.id !== 'dropzone') return;
     const dragId: string = active.id;
-
-    // dragId 我們規約：
-    //   財產：pm::<stockId>
-    //   非財產：non::<productId>::<fromLocation>
     if (dragId.startsWith('pm::')) {
-      const stockId = dragId.slice(4);
-      const src = (data?.propertyManaged ?? []).find(i => i.stockId === stockId);
-      if (!src) return;
-      // 避免重複加入同一 stock
-      setCart(prev => (prev.some(x => x.type === 'pm' && x.stockId === stockId) ? prev : [
-        ...prev,
-        {
-          type: 'pm',
-          stockId,
-          product: src.product,
-          fromLocation: src.locationId,
-          fromPath: src.locationPath,
-          toLocation: '',
-        },
-      ]));
+      addPmByStockId(dragId.slice(4));
     } else if (dragId.startsWith('non::')) {
       const [, productId, fromLocation] = dragId.split('::');
-      const src = (data?.nonPropertyManaged ?? []).find(i => i.productId === productId && i.locationId === fromLocation);
-      if (!src) return;
-      // 預設加入 1，之後可於轉移區調整
-      setCart(prev => [
-        ...prev,
-        {
-          type: 'non',
-          productId,
-          product: src.product,
-          fromLocation,
-          fromPath: src.locationPath,
-          toLocation: '',
-          quantity: 1,
-          maxQuantity: src.quantity,
-        },
-      ]);
+      addNonByKey(productId, fromLocation);
     }
   }
 
-  // 檢查有效性
+  // 檢查有效性（原樣）
   const validateCart = () => {
     if (cart.length === 0) return '請先加入要轉移的項目';
-    // 不可 toLocation 空或等於 fromLocation
+
     for (const c of cart) {
       if (!c.toLocation) return '請為每筆選擇目標地點';
       if (c.toLocation === c.fromLocation) return '目標地點不可與來源相同';
-      if (c.type === 'non') {
-        if (c.quantity < 1) return '數量不可小於 1';
-      }
+
+      const leaf = flatLoc.find(l => l.id === c.toLocation)?.isLeaf;
+      if (!leaf) return '目標地點只能選擇結構最底層的節點';
+
+      if (c.type === 'non' && c.quantity < 1) return '數量不可小於 1';
     }
-    // 非財產的同一 (productId, fromLocation) 總和不可超過可用量
+
     const sumMap = new Map<string, { used: number; cap: number }>();
     for (const group of data?.nonPropertyManaged ?? []) {
       sumMap.set(`${group.productId}::${group.locationId}`, { used: 0, cap: group.quantity });
@@ -228,7 +271,7 @@ export default function TransfersModal({
     return '';
   };
 
-  // 產生送出的 payload
+  // 產生送出的 payload（原樣）
   const buildPayload = () => {
     return cart.map(c =>
       c.type === 'pm'
@@ -252,7 +295,6 @@ export default function TransfersModal({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
-      // 成功：重載來源清單、清空轉移區、關閉確認窗
       await mutate();
       setCart([]);
       setConfirmOpen(false);
@@ -302,7 +344,11 @@ export default function TransfersModal({
                 </div>
                 <div className="grid gap-3 max-h-80 overflow-auto p-1 border rounded dark:border-gray-700">
                   {pmList.map(item => (
-                    <DraggableCard key={item.stockId} id={`pm::${item.stockId}`}>
+                    <DraggableCard
+                      key={item.stockId}
+                      id={`pm::${item.stockId}`}
+                      onAdd={() => addPmByStockId(item.stockId)}
+                    >
                       <div className="text-sm font-medium">{item.product.name}</div>
                       <div className="text-xs text-gray-600 dark:text-gray-300">
                         型號 {item.product.model}・品牌 {item.product.brand}
@@ -333,6 +379,7 @@ export default function TransfersModal({
                     <DraggableCard
                       key={`${item.productId}::${item.locationId}`}
                       id={`non::${item.productId}::${item.locationId}`}
+                      onAdd={() => addNonByKey(item.productId, item.locationId)}
                     >
                       <div className="text-sm font-medium">{item.product.name}</div>
                       <div className="text-xs text-gray-600 dark:text-gray-300">
@@ -351,7 +398,7 @@ export default function TransfersModal({
 
             {/* 轉移區 */}
             <div className="px-6 pb-6">
-              <h3 className="text-lg font-semibold mb-2">轉移區（把卡片拖進來）</h3>
+              <h3 className="text-lg font-semibold mb-2">轉移區（把卡片拖進來，或點每列的加入）</h3>
               <DropZone onDropId={() => {}}>
                 {cart.length === 0 ? (
                   <div className="text-sm text-gray-500">尚未加入任何項目</div>
@@ -436,13 +483,15 @@ export default function TransfersModal({
                                 setCart(prev => prev.map((x, i) => i === idx ? ({ ...x, toLocation: v } as CartItem) : x));
                               }}
                             >
-                              <option value="">— 請選擇 —</option>
-                              {flatLoc.map(l => (
-                                <option key={l.id} value={l.id}>
-                                  {l.label}
-                                </option>
-                              ))}
-                            </select>
+                                <option value="">— 請選擇 —</option>
+                                {flatLoc
+                                  .filter(l => l.isLeaf)
+                                  .map(l => (
+                                    <option key={l.id} value={l.id}>
+                                      {l.label}
+                                    </option>
+                                  ))}
+                              </select>
                             <button
                               className="text-red-500 hover:underline ml-2"
                               onClick={() => setCart(prev => prev.filter((_, i) => i !== idx))}

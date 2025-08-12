@@ -1,5 +1,6 @@
 // app/api/products/route.ts
 export const runtime = "nodejs"; // 需要 fs
+import { sortProductsInPlace } from "@/components/sortProducts";
 
 import { NextResponse } from "next/server";
 import path from "path";
@@ -119,6 +120,7 @@ export async function POST(req: Request) {
     };
 
     saveProducts([...list, item]);
+    await sortProductsInPlace(); 
     return NextResponse.json(item, { status: 201 });
   } catch (err: any) {
     console.error("[products POST]", err);

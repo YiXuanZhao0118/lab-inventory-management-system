@@ -67,7 +67,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
     "/generate_QRcode",
     "/device-registration",
     "/stocks",
-    "/admin",
+    "/admin"
   ];
   const needsAuth = !publicPaths.includes(pathname);
 

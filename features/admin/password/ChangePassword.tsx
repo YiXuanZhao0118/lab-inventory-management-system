@@ -22,7 +22,7 @@ const ChangePasswordPage: React.FC = () => {
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const MIN_LEN = 8;
+  const MIN_LEN = 6;
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();

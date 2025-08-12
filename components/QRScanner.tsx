@@ -1,3 +1,4 @@
+//components\QRScanner.tsx
 "use client";
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
@@ -279,6 +280,19 @@ const QRScanner: React.FC<QRScannerProps> = ({
         }
       }, Math.max(60, scanInterval));
     } catch (err: any) {
+        const name = err?.name || "";
+  const msg = String(err?.message || err || "");
+
+      // 這類錯誤常見於剛授權或裝置切換時，做一次快速重試
+      if (name === "AbortError" || /operation was aborted/i.test(msg)) {
+        setStatusSafe("相機啟動中斷，正在重試…");
+        // 保留目前 modal，不要關閉
+        setTimeout(() => {
+          start();  // 重新啟動一次
+        }, 400);
+        return;
+      }
+
       setStatusSafe(err?.name === "NotAllowedError" ? "使用者拒絕相機權限" : "啟動相機失敗");
       onError?.(err instanceof Error ? err : new Error(String(err)));
       if (stream) stream.getTracks().forEach((t) => t.stop());

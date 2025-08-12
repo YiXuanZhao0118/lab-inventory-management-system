@@ -1,4 +1,4 @@
-// pages\StockList.tsx
+// features\StockList.tsx
 "use client";
 
 import DiscardedModal from '@/features/Discarded';
@@ -14,11 +14,7 @@ import hiIN from "@/app/data/language/hi.json";
 import deDE from "@/app/data/language/de.json";
 import { useSearchParams } from "next/navigation";
 
-const fetcher = (url: string) =>
-  fetch(url).then((r) => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
-  });
+import { fetcher } from "@/services/apiClient";
 
 type Product = {
   id: string;
@@ -185,11 +181,6 @@ export default function StockList() {
     { key: "model", label: t.model, accessor: (r: RowPM) => r.product.model },
     { key: "brand", label: t.brand, accessor: (r: RowPM) => r.product.brand },
     {
-      key: "specifications",
-      label: t.specifications,
-      accessor: (r: RowPM) => r.product.specifications ?? r.product.spec ?? "-",
-    },
-    {
       key: "location",
       label: t.location,
       accessor: (r: RowPM) => r.locationPath.join(" → "),
@@ -200,11 +191,6 @@ export default function StockList() {
     { key: "name", label: t.name, accessor: (r: RowNonPM) => r.product.name },
     { key: "model", label: t.model, accessor: (r: RowNonPM) => r.product.model },
     { key: "brand", label: t.brand, accessor: (r: RowNonPM) => r.product.brand },
-    {
-      key: "specifications",
-      label: t.specifications,
-      accessor: (r: RowNonPM) => r.product.specifications ?? r.product.spec ?? "-",
-    },
     {
       key: "location",
       label: t.location,
@@ -228,7 +214,6 @@ export default function StockList() {
         "product" in row ? row.product.name : "",
         "product" in row ? row.product.model : "",
         "product" in row ? row.product.brand : "",
-        "product" in row ? (row.product.specifications ?? row.product.spec ?? "") : "",
         row.locationPath.join(" → "),
       ];
 
@@ -400,7 +385,7 @@ export default function StockList() {
                 viewMode === "individual" ? (
                   <tr key={(row as RowPM).id}>
                     {individualCols.map((col) => (
-                      <td key={col.key as string} className="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
+                      <td key={col.key as string} className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-700 dark:text-gray-300">
                         {col.accessor(row as RowPM)}
                       </td>
                     ))}
@@ -433,7 +418,7 @@ export default function StockList() {
                 ) : (
                   <tr key={`${(row as RowNonPM).product.id}-${(row as RowNonPM).locationId}`}>
                     {aggregatedCols.map((col) => (
-                      <td key={col.key as string} className="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
+                      <td key={col.key as string} className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-700 dark:text-gray-300">
                         {col.accessor(row as RowNonPM)}
                       </td>
                     ))}

@@ -8,7 +8,7 @@ import enUS from '@/app/data/language/en-US.json';
 import hiIN from "@/app/data/language/hi.json";
 import deDE from "@/app/data/language/de.json";
 
-const MIN_LEN = 8;
+const MIN_LEN = 6;
 
 const CreateAccount: React.FC = () => {
   const { language } = useLanguage();

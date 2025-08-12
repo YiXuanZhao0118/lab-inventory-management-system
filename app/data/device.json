@@ -1,122 +1,47 @@
 [
   {
-    "deviceId": "c28aea08-0a99-4cb4-8c75-ee134d366818",
-    "name": "Lab330 iPad",
-    "currentDate": "2025-05-27T08:58:52.387Z"
-  },
-  {
     "deviceId": "08277ca6-33e6-42b9-9455-7de1e21dd6a9",
     "name": "XYZ",
-    "currentDate": "2025-05-27T17:18:52.182Z"
-  },
-  {
-    "deviceId": "ccbbddcc-8464-4eab-b764-6f65df39cba3",
-    "name": "XYZ",
-    "currentDate": "2025-05-28T03:54:22.336Z"
+    "currentDate": "2025-08-10T08:14:44.815Z"
   },
   {
     "deviceId": "ecb6d7f4-45ba-4870-8dd5-11d529ca92b6",
-    "name": "Lab330 iPad",
-    "currentDate": "2025-05-28T04:52:00.330Z"
-  },
-  {
-    "deviceId": "8a29f14f-d21b-42b6-b0fa-9005c4fb06f6",
-    "name": "JY",
-    "currentDate": "2025-05-28T08:55:19.475Z"
-  },
-  {
-    "deviceId": "1b91914f-b839-4ea6-88e8-98690e9949d5",
-    "name": "Dong",
-    "currentDate": "2025-05-28T08:58:50.236Z"
-  },
-  {
-    "deviceId": "34d682af-cd6f-4b83-9e20-1f7296b2fdfa",
-    "name": "XYZ",
-    "currentDate": "2025-05-30T12:31:06.957Z"
-  },
-  {
-    "deviceId": "167b0bf2-ae9d-4a14-8099-b854b3f35a66",
-    "name": "XYZ",
-    "currentDate": "2025-06-05T12:31:47.387Z"
-  },
-  {
-    "deviceId": "52159b92-bca7-449b-b9b7-4e00a9ec82c8",
-    "name": "王勝弘",
-    "currentDate": "2025-06-09T12:01:42.988Z"
-  },
-  {
-    "deviceId": "57471247-0921-4916-a63e-8a10d93c4139",
-    "name": "文山",
-    "currentDate": "2025-06-10T08:52:21.441Z"
-  },
-  {
-    "deviceId": "378d69ea-e3d6-44bf-9c5d-fefccaf6cddd",
-    "name": "文山",
-    "currentDate": "2025-06-11T12:39:13.103Z"
-  },
-  {
-    "deviceId": "e90b2eac-8faa-4e37-a211-65857cae12e6",
-    "name": "趙峻毅",
-    "currentDate": "2025-06-11T13:09:12.721Z"
-  },
-  {
-    "deviceId": "768f750b-7f96-48e2-91f2-2f726d8eea34",
-    "name": "文山",
-    "currentDate": "2025-06-12T06:12:34.571Z"
-  },
-  {
-    "deviceId": "6d41c650-1213-4a95-86d5-cfeb65cd6989",
-    "name": "文山",
-    "currentDate": "2025-06-12T13:21:01.786Z"
-  },
-  {
-    "deviceId": "8865800b-1021-4865-83f6-12cbb5bea879",
-    "name": "XYZ",
-    "currentDate": "2025-06-13T07:32:27.015Z"
-  },
-  {
-    "deviceId": "8511bfdf-69fc-47b5-bfcb-f40aee594296",
-    "name": "wunshan",
-    "currentDate": "2025-07-08T01:46:41.244Z"
-  },
-  {
-    "deviceId": "d38f887c-b1cf-4dcd-aa0f-234aedfd7128",
-    "name": "wunshan",
-    "currentDate": "2025-07-08T02:51:00.857Z"
-  },
-  {
-    "deviceId": "22ef354e-819e-4323-a80e-ec104c6d5b3b",
-    "name": "PaoJung",
-    "currentDate": "2025-07-16T06:11:50.093Z"
-  },
-  {
-    "deviceId": "b6827b1b-840d-4688-a794-c6c1ebcb7553",
-    "name": "采妮",
-    "currentDate": "2025-07-17T12:13:16.819Z"
-  },
-  {
-    "deviceId": "37369354-a048-41e9-b1ad-56797562cee8",
-    "name": "test",
-    "currentDate": "2025-08-08T00:02:07.388Z"
+    "name": "iPad",
+    "currentDate": "2025-08-10T08:15:23.016Z"
   },
   {
     "deviceId": "35606d59-b640-484d-b6ad-070b64cbd399",
-    "name": "Test",
-    "currentDate": "2025-08-08T11:46:01.120Z"
+    "name": "iPad",
+    "currentDate": "2025-08-10T08:18:02.464Z"
   },
   {
-    "deviceId": "44b80713-bb26-458a-8e54-d1d9d7083ab6",
-    "name": "test",
-    "currentDate": "2025-08-08T14:27:48.356Z"
+    "deviceId": "3cc3b07e-0a13-446b-b9c0-5d27cc72306e",
+    "name": "YC",
+    "currentDate": "2025-08-10T08:47:50.713Z"
   },
   {
     "deviceId": "076d4b5e-038d-42a3-a872-b8b804ba35f9",
-    "name": "TEST",
-    "currentDate": "2025-08-08T14:42:45.777Z"
+    "name": "XYZ",
+    "currentDate": "2025-08-11T02:43:40.868Z"
   },
   {
-    "deviceId": "5b8e0e63-d03d-40fb-9c2f-27b54ea3f889",
-    "name": "test",
-    "currentDate": "2025-08-09T13:38:23.627Z"
+    "deviceId": "c6f2ea54-1784-490a-9d7d-78cbd1c78bf9",
+    "name": "XYZ",
+    "currentDate": "2025-08-11T05:29:50.669Z"
+  },
+  {
+    "deviceId": "d446d16f-e652-4600-8ae8-de0e5e628688",
+    "name": "CHAO,JUN-YI",
+    "currentDate": "2025-08-11T05:40:08.164Z"
+  },
+  {
+    "deviceId": "28c05978-948c-4fd5-b542-3e10a7a0be4c",
+    "name": "iPad",
+    "currentDate": "2025-08-11T07:27:13.971Z"
+  },
+  {
+    "deviceId": "37369354-a048-41e9-b1ad-56797562cee8",
+    "name": "YC",
+    "currentDate": "2025-08-11T12:45:53.569Z"
   }
 ]

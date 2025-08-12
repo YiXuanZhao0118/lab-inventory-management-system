@@ -151,7 +151,7 @@ export default function ShortTermPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           rentedItemId: rec.id,
-          addHours: 3, // ★ 直接告訴後端延長 3 小時
+          addHours: 3,
         }),
       });
       const json = await res.json();
@@ -174,11 +174,12 @@ export default function ShortTermPage() {
   };
 
   useEffect(() => {
-    if (scanError) {
-      alert(t.borrowFailed.replace("{errorMessage}", scanError));
-      setScanError(null);
-    }
-  }, [scanError]);
+    if (!scanError) return;
+    // 任何語系缺 key 時，回退到 zh-TW；再不行就用英文預設
+    const tpl = tt("scanFailed", "Scan failed: {errorMessage}");
+    alert(fmt(tpl, { errorMessage: scanError }));
+    setScanError(null);
+  }, [scanError, t]);
 
   if (availLoading || retrLoading || !deviceId) {
     return <div className="p-8 text-center text-gray-600 dark:text-gray-400">{t.loading}</div>;
@@ -193,6 +194,18 @@ export default function ShortTermPage() {
       {t.loadRetrError.replace("{errorMessage}", (retrError as Error).message)}
     </div>;
   }
+
+  // safe i18n getter with zh-TW fallback (no strict key union)
+  const tt = (key: string, fallback = ""): string => {
+    const base = (zhTW as any).ShortTermLoan ?? {};
+    const curr = (t as any) ?? {};
+    const v = curr[key] ?? base[key] ?? fallback;
+    return typeof v === "string" ? v : fallback;
+  };
+
+  // simple templating: replaces {var} with values
+  const fmt = (tpl: string, vars: Record<string, string | number>) =>
+    tpl.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
 
   return (
     <div className="container mx-auto max-w-screen px-4 md:px-8 py-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg space-y-8">
@@ -219,14 +232,15 @@ export default function ShortTermPage() {
               <QRScanner
                 onScan={handleScan}
                 onError={(err) => {
-                  setScanError(err.message);
+                  setScanError(String(err?.message || err || ""));
                   setScannerOpen(false);
                 }}
+                active={scannerOpen}
               />
             </div>
             <button
               className="mt-2 inline-block text-red-500 hover:underline"
-              onClick={() => setScannerOpen(false)}
+              onClick={() => { setScanError(null); setScannerOpen(false); }}
             >
               {t.closeScanner}
             </button>

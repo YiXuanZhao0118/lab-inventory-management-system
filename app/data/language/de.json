@@ -43,7 +43,7 @@
       "menu_edit_property": "Eigenschaft bearbeiten",
       "menu_dashboard": "Dashboard",
       "menu_stock_list": "Bestandsliste",
-      "menu_all_loan_records": "Alle Ausleihaufzeichnungen"
+      "menu_all_loan_records": "Kurzzeit-Ausleihstatus"
     },
     "LocationTree": {
       "Alert1Part1": "Name",
@@ -62,23 +62,43 @@
       "model": "Modell",
       "brand": "Marke",
       "specifications": "Spezifikationen",
+      "price": "Preis",
       "imageLink": "Bildlink (optional)",
       "add_product": "Produkt hinzufügen",
       "add_location": "Standort hinzufügen",
       "addProduct_success": "Produkt erfolgreich hinzugefügt!",
       "addProduct_fail": "Hinzufügen fehlgeschlagen, bitte erneut versuchen.",
       "loading": "Lädt...",
-      "addProduct_duplicate_error":"❗ Ein Produkt mit gleicher Modellnummer und Marke existiert bereits und kann nicht hinzugefügt werden."
+      "addProduct_duplicate_error":"❗ Ein Produkt mit gleicher Modellnummer und Marke existiert bereits und kann nicht hinzugefügt werden.",
+      "addProduct_success_with_image":"Neues Produkt erfolgreich hinzugefügt (Bild heruntergeladen).",
+      "addProduct_success_no_image":"Neues Produkt erfolgreich hinzugefügt (Bild herunterladen fehlgeschlagen, auf null gesetzt).",
+      "isPropertyManaged": "Verwaltetes Eigentum",
+      "autoDownloadNote": [
+        "Nach dem Hochladen der Dateien versucht das System, den Bildlink ",
+        { "type": "code", "var": "path" },
+        " herunterzuladen und zu speichern; bei Fehlschlag wird ",
+        { "type": "code", "var": "field" },
+        " auf ",
+        { "type": "code", "text": "null" },
+        " gesetzt."
+      ],
+      "overwrite": "Overwrite non-empty fields",
+      "fill_from_analyzer": "Fill form with analyzer result",
+      "urlPlaceholder": "Geben Sie die Produkt-URL zum Analysieren ein (z.B. https://www.thorlabs.com/thorproduct.cfm?partnumber=KA05)"
     },
     "EditModal": {
+      "price_invalid": "Preis muss größer als 0 sein",
+      "price_non_negative": "Preis darf nicht negativ sein",
       "title": "Produkt bearbeiten",
       "name": "Produktname",
       "model": "Modell",
+      "price": "Preis",
       "brand": "Marke",
       "specifications": "Spezifikationen",
       "imageLink": "Bildlink (optional)",
       "cancel": "Abbrechen",
-      "save": "Speichern"
+      "save": "Speichern",
+      "localImage_hint": "Nach dem Speichern versucht das System, den Bildlink herunterzuladen; bei Fehlschlag bleibt er null."
     },
     "EditProducts": {
       "title": "Produkte bearbeiten",
@@ -86,10 +106,22 @@
       "model": "Modell",
       "brand": "Marke",
       "specifications": "Spezifikationen",
+      "price": "Preis",
       "actions": "Aktionen",
       "edit": "Bearbeiten",
       "download_qrcode": "QR-Code herunterladen",
-      "search": "Produkt suchen..."
+      "search": "Produkt suchen...",
+      "editProduct_duplicate_error":"❗ Ein Produkt mit gleicher Modellnummer und Marke existiert bereits und kann nicht mit denselben Daten aktualisiert werden.",
+      "editProduct_success":"Produkt erfolgreich aktualisiert!",
+      "editProduct_fail":"Aktualisierung fehlgeschlagen, bitte erneut versuchen.",
+      "delete_in_use": "❗ Produkt kann nicht gelöscht werden, da es bereits in Lagerartikeln verwendet wird.",
+      "delete_confirm": "Sind Sie sicher, dass Sie dieses Produkt löschen möchten?",
+      "delete_success": "Produkt erfolgreich gelöscht!",
+      "delete_failed": "Produktlöschung fehlgeschlagen, bitte erneut versuchen.",
+      "load_fail": "Laden der Produkte fehlgeschlagen",
+      "loading": "Lädt...",
+      "delete_disabled_hint": "❗ Produkt kann nicht gelöscht werden, da es bereits in Lagerartikeln verwendet wird.",
+      "delete": "Löschen"
     },
     "Account": {
       "ChangePassword": {
@@ -103,7 +135,13 @@
         "change": "Passwort ändern",
         "verify_failed": "Verifizierung fehlgeschlagen",
         "change_success": "Passwort erfolgreich geändert",
-        "change_failed": "Passwortänderung fehlgeschlagen"
+        "change_failed": "Passwortänderung fehlgeschlagen",
+        "too_short": "Neues Passwort ist zu kurz, mindestens",
+        "not_match": "Neues Passwort und Bestätigung stimmen nicht überein",
+        "loading": "Lädt...",
+        "hint_min_length": "Password length must be at least",
+        "hint_min": "Password length must be at least",
+        "back": "Zurück zum Konto"
       },
       "CreateAccount": {
         "title": "Konto erstellen",
@@ -113,7 +151,10 @@
         "create": "Konto erstellen",
         "success": "✅ Konto erfolgreich erstellt",
         "fail": "❌ Erstellung fehlgeschlagen",
-        "not_match": "❗ Passwort und Bestätigung stimmen nicht überein"
+        "not_match": "❗ Passwort und Bestätigung stimmen nicht überein",
+        "too_short": "❗ Passwort ist zu kurz",
+        "hint_min": "Password length must be at least",
+        "loading": "Processing..."
       }
     },
     "History": {
@@ -387,7 +428,10 @@
     "loading": "Lädt...",
     "loadFailed": "Laden fehlgeschlagen",
     "noRecords": "Keine ausstehenden Rückgaben.",
-    "unknownProduct": "Unbekanntes Produkt"
+    "unknownProduct": "Unbekanntes Produkt",
+    "searchPlaceholder": "Lager-ID/Produkt-ID/Produktname/Modell/Marke/Entleiher suchen...",
+    "showOverdueOnly": "Nur überfällige anzeigen",
+    "refresh": "Aktualisieren"
   },
   "FileUploadModal": {
     "title": "Datei für Produkt hochladen ({{productId}})",

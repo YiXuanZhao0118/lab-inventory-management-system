@@ -43,7 +43,7 @@
       "menu_edit_property": "編輯財產",
       "menu_dashboard": "儀表板",
       "menu_stock_list": "庫存列表",
-      "menu_all_loan_records": "所有借用記錄"
+      "menu_all_loan_records": "短期借用記錄"
     },
     "LocationTree": {
       "Alert1Part1": "名稱",
@@ -62,23 +62,43 @@
       "model": "型號",
       "brand": "廠牌",
       "specifications": "規格",
+      "price": "價格",
       "imageLink": "圖片連結（選填）",
       "add_product": "新增產品",
       "add_location": "新增位置",
       "addProduct_success":"產品新增成功！",
       "addProduct_fail":"新增失敗，請重試。",
       "loading": "載入中...",
-      "addProduct_duplicate_error": "❗相同型號和品牌的產品已經存在，無法添加新產品。"
+      "addProduct_duplicate_error": "❗相同型號和品牌的產品已經存在，無法添加新產品。",
+      "addProduct_success_with_image":"新增成功（圖片已下載）",
+      "addProduct_success_no_image":"新增成功（圖片下載失敗，已設為 null）",
+      "isPropertyManaged": "財產管理",
+      "autoDownloadNote": [
+        "※ 送出後後端會自動嘗試下載圖片至 ",
+        { "type": "code", "var": "path" },
+        "，失敗則把 ",
+        { "type": "code", "var": "field" },
+        " 設為 ",
+        { "type": "code", "text": "null" },
+        "。"
+      ],
+      "overwrite": "覆蓋非空欄位",
+      "fill_from_analyzer": "套用解析結果到表單",
+      "urlPlaceholder": "請輸入產品網址以進行分析（例如：https://www.thorlabs.com/thorproduct.cfm?partnumber=KA05）"
     },
     "EditModal": {
+      "price_invalid": "價格必須大於 0",
+      "price_non_negative": "價格不能為負數",
       "title": "編輯產品",
       "name": "產品名稱",
       "model": "型號",
+      "price": "價格",
       "brand": "廠牌",
       "specifications": "規格",
-      "imageLink": "圖片連結（選填）",
+      "imageLink": "圖片連結",
       "cancel": "取消",
-      "save": "儲存"
+      "save": "儲存",
+      "localImage_hint":"儲存後，系統會嘗試下載 imageLink；失敗則保持為 null。"
     },
     "EditProducts": {
       "title": "編輯產品",
@@ -86,11 +106,23 @@
       "model": "型號",
       "brand": "廠牌",
       "specifications": "規格",
+      "price": "價格",
       "actions": "操作",
       "edit": "編輯",
       "download_qrcode": "下載 QR Code",
-      "search": "搜尋產品..."
-    },
+      "search": "搜尋產品...",
+      "editProduct_duplicate_error":"❗ 已存在相同型號與廠牌的產品，無法更新為相同內容。",
+      "editProduct_success":"產品更新成功！",
+      "editProduct_fail":"更新失敗，請重試。",
+      "delete_in_use": "❗ 無法刪除產品，因為它已被庫存項目使用。",
+      "delete_confirm": "確定要刪除此產品嗎？",
+      "delete_success": "產品已成功刪除！",
+      "delete_failed": "刪除失敗，請重試。",
+      "load_fail": "載入產品失敗",
+      "loading": "載入中...",
+      "delete_disabled_hint": "❗ 無法刪除產品，因為它已被庫存項目使用。",
+      "delete": "刪除"
+    }, 
     "Account": {
       "ChangePassword": {
         "title_verify": "變更密碼",
@@ -103,7 +135,13 @@
         "change": "變更密碼",
         "verify_failed": "驗證失敗",
         "change_success": "密碼變更成功",
-        "change_failed": "密碼變更失敗"
+        "change_failed": "密碼變更失敗",
+        "too_short": "新密碼長度不足，至少為",
+        "not_match": "新密碼與確認新密碼不一致",
+        "loading": "載入中...",
+        "hint_min_length": "密碼長度至少為",
+        "hint_min": "密碼長度至少為",
+        "back": "返回"
       },
       "CreateAccount": {
         "title": "新增帳號",
@@ -113,7 +151,10 @@
         "create": "建立帳號",
         "success": "✅ 帳號建立成功",
         "fail": "❌ 建立失敗",
-        "not_match": "❗ 密碼與確認密碼不一致"
+        "not_match": "❗ 密碼與確認密碼不一致",
+        "too_short": "❗ 密碼長度不足",
+        "hint_min": "密碼長度至少為",
+        "loading": "處理中..."
       }
     },
     "History": {
@@ -387,7 +428,10 @@
     "loading": "載入中...",
     "loadFailed": "載入失敗",
     "noRecords": "無未歸還記錄。",
-    "unknownProduct": "未知產品"
+    "unknownProduct": "未知產品",
+    "searchPlaceholder": "搜尋 庫存 ID/產品 ID/產品名稱/型號/廠牌/借用者...",
+    "showOverdueOnly": "僅顯示逾期",
+    "refresh": "重新整理"
   },
   "FileUploadModal": {
     "title": "上傳產品檔案 ({{productId}})",
