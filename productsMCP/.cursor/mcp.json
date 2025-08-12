@@ -1,8 +1,0 @@
-{
-    "mcpServers": {
-        "mcp.github.com": {
-            "command": "python",
-            "args": ["D:/test/test.py"]
-        }
-    }
-}
